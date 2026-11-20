@@ -65,8 +65,6 @@ repositorio/
 └── README.md                    Este documento
 ```
 
-La especificación del MVP está en la carpeta `specifications\`, junto al repositorio (ver sección 11).
-
 ### Backend
 
 - `Veterinaria.Api`: la capa de entrada. Tiene los controladores, el manejo de errores (en español), la autenticación (Basic Auth para el login y JWT para el resto), los contratos de entrada y salida (DTO) y las opciones de configuración.
@@ -121,11 +119,7 @@ El archivo `.env` está en la raíz de `repositorio\`. Docker Compose lo lee al 
 
 **El archivo `.env` contiene credenciales.** Cada persona debe definir sus propios valores, y no debe compartirlos ni subirlos a un repositorio público. Los nombres de las variables que aparecen abajo son los que usa el proyecto; los valores no se incluyen en este documento.
 
-### Cómo crearlo
-
-Si el repositorio incluye una plantilla (por ejemplo, `.env.example`), cópiela con el nombre `.env`. Si no existe, cree un archivo `.env` en `repositorio\` con las variables de la tabla siguiente.
-
-Formato de ejemplo (los valores son marcadores; defina los suyos):
+### Formato de ejemplo (los valores son marcadores; defina los suyos):
 
 ```text
 POSTGRES_DB=<nombre de la base>
@@ -215,7 +209,7 @@ Estas dos variables también alimentan el build del frontend (`VITE_BASIC_AUTH_U
 
 No hace falta instalar .NET, Node.js ni PostgreSQL en el equipo para ejecutar el sistema con Compose: todos corren dentro de contenedores.
 
-Solo si quiere ejecutar las pruebas de dominio (sección 8), necesita el .NET SDK 10.
+Solo si quiere ejecutar las pruebas de dominio, necesita el .NET SDK 10.
 
 ### Puertos que usa el sistema
 
@@ -230,11 +224,11 @@ Solo si quiere ejecutar las pruebas de dominio (sección 8), necesita el .NET SD
 1. Clone el repositorio y entre a la carpeta `repositorio`:
 
    ```powershell
-   git clone <url-del-repositorio>
-   cd repositorio
+   git clone (https://github.com/juanhenao219340/RaizYHuella-CalidadDeSoftware.git)
+   cd RaizYHuella-CalidadDeSoftware
    ```
 
-2. Cree el archivo `.env` en esa carpeta, con las variables de la sección 5 y sus propios valores.
+2. Compruebe la existencia del archivo `.env` en esa carpeta, con las variables de la sección 5 y sus propios valores.
 
 3. Construya las imágenes:
 

@@ -5,15 +5,9 @@ namespace Veterinaria.Api.Contracts;
 // OwnerId is never accepted from the body: it always comes from the JWT subject (RF-PRO-09, D-1).
 public sealed record CreatePetRequest
 {
-    public const int MaxIdentifierLength = 50;
     public const int MaxNameLength = 100;
     public const int MaxSpeciesLength = 50;
     public const int MaxBreedLength = 100;
-
-    [Required(ErrorMessage = "El identificador de la mascota es obligatorio.")]
-    [StringLength(MaxIdentifierLength, ErrorMessage = "El identificador no puede superar 50 caracteres.")]
-    [NotReservedPrefix]
-    public string Identifier { get; init; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre de la mascota es obligatorio.")]
     [StringLength(MaxNameLength, ErrorMessage = "El nombre no puede superar 100 caracteres.")]
@@ -32,7 +26,7 @@ public sealed record CreatePetRequest
     public DateOnly? BirthDate { get; init; }
 }
 
-// Identifier and owner are not editable (D-6, RF-PRO-09). Any such field sent by the client is ignored.
+// Owner is not editable (D-6, RF-PRO-09). Any such field sent by the client is ignored.
 public sealed record UpdatePetRequest
 {
     [Required(ErrorMessage = "El nombre de la mascota es obligatorio.")]
@@ -55,7 +49,6 @@ public sealed record UpdatePetRequest
 // Nullable bool so that the owner response keeps the same keys with null values (D-2).
 public sealed record PetResponse(
     Guid Id,
-    string Identifier,
     string Name,
     string Species,
     string Breed,

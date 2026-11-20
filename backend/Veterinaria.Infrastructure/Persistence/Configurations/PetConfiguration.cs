@@ -11,14 +11,9 @@ public sealed class PetConfiguration : IEntityTypeConfiguration<Pet>
     {
         builder.ToTable("Pets");
 
-        builder.Property(pet => pet.Identifier).HasMaxLength(50).IsRequired();
         builder.Property(pet => pet.Name).HasMaxLength(100);
         builder.Property(pet => pet.Species).HasMaxLength(50);
         builder.Property(pet => pet.Breed).HasMaxLength(100);
-
-        builder.HasIndex(pet => pet.Identifier)
-            .IsUnique()
-            .HasDatabaseName("IX_Pets_Identifier");
 
         builder.HasOne<ApplicationUser>()
             .WithMany()

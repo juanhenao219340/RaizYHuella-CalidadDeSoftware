@@ -10,6 +10,22 @@ public static class AppointmentModificationRules
     // Single RF-PRO-07 message for both the domain check and the concurrency translation in persistence (RF-PRO-07, T-06 r4).
     public const string CancelledMessage = "La cita está anulada y no puede modificarse.";
 
+    // Automatic reason of the cancellations made when a service is deleted (R18-1). Goes through the same RN-04 validation.
+    public const string ServiceDeletedReason = "Servicio eliminado por la clínica.";
+
+    // Selection of the appointments cancelled by a service deletion: confirmed and starting after the current moment in the business time zone (D2).
+    public static bool IsFutureConfirmed(Appointment appointment, DateTimeOffset nowUtc, BusinessRulesOptions options)
+    {
+        if (appointment.Status != AppointmentStatus.Confirmed)
+        {
+            return false;
+        }
+
+        var localNow = TimeZoneInfo.ConvertTime(nowUtc, options.GetTimeZone()).DateTime;
+
+        return appointment.Date.ToDateTime(appointment.StartTime.StartTime) > localNow;
+    }
+
     public static DomainResult ValidateCancellation(UserRole actor, Appointment appointment, string? reason) =>
         ValidateCommon(actor, appointment, reason, "anular");
 

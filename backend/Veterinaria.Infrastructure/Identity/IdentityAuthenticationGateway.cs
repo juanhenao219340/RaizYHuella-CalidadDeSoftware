@@ -21,9 +21,12 @@ public sealed class IdentityAuthenticationGateway(
         // lockoutOnFailure applies the per-account lockout (RF-AUT-07, RN-05). It does not sign in with a cookie.
         var result = await signInManager.CheckPasswordSignInAsync(applicationUser, password, lockoutOnFailure: true);
 
+        // Identity checks the lockout before the password and does not count attempts made during it,
+        // so the lockout end is not extended by them (RN-05, D-4).
         if (result.IsLockedOut)
         {
-            return new LoginResult(LoginOutcome.LockedOut, null, null);
+            var lockoutEnd = await userManager.GetLockoutEndDateAsync(applicationUser);
+            return new LoginResult(LoginOutcome.LockedOut, null, null, lockoutEnd);
         }
 
         if (!result.Succeeded)

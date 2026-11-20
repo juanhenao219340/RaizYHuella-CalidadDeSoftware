@@ -49,7 +49,7 @@ function LoginPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center p-4">
       <div className="flex flex-col items-center gap-2">
-        <img src="/gemini-svg.svg" alt="Logotipo de Raíz y Huella" width="48" height="48" />
+        <img src="/logo.svg" alt="Logotipo de Raíz y Huella" className="h-[300px] w-[300px] max-sm:h-[200px] max-sm:w-[200px]" />
         <p className="text-lg font-bold text-text">Raíz y Huella</p>
       </div>
 

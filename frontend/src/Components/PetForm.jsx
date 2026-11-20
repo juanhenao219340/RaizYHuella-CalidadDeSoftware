@@ -6,13 +6,12 @@ import FormField from './FormField'
 import { getConflictField, splitFieldErrors } from '../Services/errorMessages'
 import { validatePetCreate, validatePetUpdate } from '../Services/validation'
 
-const FORM_FIELDS = ['identifier', 'name', 'species', 'breed', 'birthDate']
+const FORM_FIELDS = ['name', 'species', 'breed', 'birthDate']
 
 // Pet create/edit form. The parent passes onSubmit; this form does not know the endpoint.
 function PetForm({ mode = 'create', initialValues = {}, onSubmit, onCancel }) {
   const isCreate = mode === 'create'
   const [values, setValues] = useState({
-    identifier: initialValues.identifier ?? '',
     name: initialValues.name ?? '',
     species: initialValues.species ?? '',
     breed: initialValues.breed ?? '',
@@ -32,7 +31,6 @@ function PetForm({ mode = 'create', initialValues = {}, onSubmit, onCancel }) {
 
     setFormError('')
     const cleaned = {
-      identifier: values.identifier.trim(),
       name: values.name.trim(),
       species: values.species.trim(),
       breed: values.breed.trim(),
@@ -64,23 +62,6 @@ function PetForm({ mode = 'create', initialValues = {}, onSubmit, onCancel }) {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       <fieldset disabled={isSubmitting} aria-busy={isSubmitting || undefined} className="flex flex-col gap-4">
-        {isCreate ? (
-          <FormField
-            id="pet-identifier"
-            label="Identificador"
-            hint="Solo se escribe al registrar la mascota."
-            value={values.identifier}
-            onChange={(event) => updateValue('identifier', event.target.value)}
-            maxLength={50}
-            error={fieldErrors.identifier}
-          />
-        ) : (
-          <div className="flex flex-col gap-1">
-            <span className="font-semibold">Identificador</span>
-            <p>{initialValues.identifier}</p>
-          </div>
-        )}
-
         <FormField
           id="pet-name"
           label="Nombre"

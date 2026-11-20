@@ -5,7 +5,7 @@ import { formatSlotCount } from '../Services/format'
 // Presentation only: the API decides availability and validates every reservation.
 function AvailabilityPicker({ slots = [], value = '', onChange, disabled = false, idPrefix = 'slot' }) {
   return (
-    <div role="group" aria-label="Hora de inicio" className="flex flex-col gap-2 md:grid md:grid-cols-5">
+    <div role="group" aria-label="Hora de inicio" className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
       {slots.map((slot) => {
         const isSelected = value === slot.startTime
         const isSelectable = slot.available && !disabled
@@ -23,12 +23,12 @@ function AvailabilityPicker({ slots = [], value = '', onChange, disabled = false
             aria-pressed={isSelected}
             disabled={!isSelectable}
             onClick={() => onChange(slot.startTime)}
-            className={`min-h-11 flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-left tabular-nums disabled:cursor-not-allowed disabled:opacity-60 ${
+            className={`flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-md border px-2 py-2 text-center break-words tabular-nums disabled:cursor-not-allowed disabled:opacity-60 ${
               isSelected ? 'border-primary bg-primary-light font-semibold text-primary' : 'border-border bg-surface'
             }`}
           >
             <span className="font-semibold">{slot.startTime}</span>
-            <span className="text-sm">{statusText}</span>
+            <span className="whitespace-nowrap text-sm">{statusText}</span>
           </button>
         )
       })}

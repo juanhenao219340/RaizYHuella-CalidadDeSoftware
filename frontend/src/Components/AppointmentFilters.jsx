@@ -4,9 +4,10 @@ import FormField from './FormField'
 // Pure helper import from Services/ (format.js): no network calls in this component.
 import { SERVICE_TYPE_OPTIONS } from '../Services/format'
 
-// Four filters combined with AND (RF-CON-01). The parent owns the state and validation messages.
+// Filters combined with AND (RF-CON-01). The owner identification filter is shown only to the administrator (decision R17-1);
+// the owner sees radicado and servicio. The parent owns the state and validation messages.
 // Below 768px (md) the filters are folded behind a "Filtrar" toggle; from md up they are always shown.
-function AppointmentFilters({ values, errors = {}, onChange, onSearch, onClear, isBusy = false }) {
+function AppointmentFilters({ values, errors = {}, onChange, onSearch, onClear, isBusy = false, isAdmin = false }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   return (
@@ -41,22 +42,16 @@ function AppointmentFilters({ values, errors = {}, onChange, onSearch, onClear, 
             maxLength={20}
             error={errors.referenceNumber}
           />
-          <FormField
-            id="filter-pet"
-            label="Mascota"
-            value={values.petIdentifier}
-            onChange={(event) => onChange('petIdentifier', event.target.value)}
-            maxLength={50}
-            error={errors.petIdentifier}
-          />
-          <FormField
-            id="filter-owner"
-            label="Identificación del propietario"
-            value={values.ownerIdentification}
-            onChange={(event) => onChange('ownerIdentification', event.target.value)}
-            maxLength={20}
-            error={errors.ownerIdentification}
-          />
+          {isAdmin && (
+            <FormField
+              id="filter-owner"
+              label="Identificación del propietario"
+              value={values.ownerIdentification}
+              onChange={(event) => onChange('ownerIdentification', event.target.value)}
+              maxLength={20}
+              error={errors.ownerIdentification}
+            />
+          )}
           <FormField
             id="filter-service"
             as="select"

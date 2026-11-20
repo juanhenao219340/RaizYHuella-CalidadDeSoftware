@@ -238,11 +238,6 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -257,10 +252,6 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Identifier")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Pets_Identifier");
 
                     b.HasIndex("OwnerId");
 

@@ -18,8 +18,8 @@ public sealed class DeletePetHandler(IPetRepository petRepository, TimeProvider 
             return false;
         }
 
-        // The identifier is replaced so the original value can be reused (RF-REG-10(e)).
-        pet.Delete(Guid.NewGuid(), timeProvider.GetUtcNow());
+        // Pets have no identifier to replace on deletion (RF-REG-10(e)).
+        pet.Delete(timeProvider.GetUtcNow());
         await petRepository.UpdateAsync(pet, cancellationToken);
 
         return true;

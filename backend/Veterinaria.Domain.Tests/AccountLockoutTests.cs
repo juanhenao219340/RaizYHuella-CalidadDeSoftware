@@ -62,7 +62,47 @@ public class AccountLockoutTests
 
         Assert.Equal(LoginOutcome.LockedOut, rejected.Outcome);
     }
-}
+
+    // RN-05 / D-4 (R15-1): attempts made during the lockout, correct or not, do not extend it and do not count.
+    [Fact]
+    public async Task AttemptsDuringLockout_DoNotExtendLockoutEnd_NorIncrementFailedCount()
+    {
+        var lockout = new DomainLockoutOptions { MaxFailedAttempts = 3, LockoutMinutes = 2 };
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddHttpContextAccessor();
+        services.AddAuthentication();
+        services.Configure<IdentityOptions>(options => IdentityConfiguration.Apply(options, lockout));
+        services.AddSingleton<IUserStore<ApplicationUser>, InMemoryUserStore>();
+        services.AddIdentityCore<ApplicationUser>().AddSignInManager();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<ApplicationUser>>();
+        var gateway = new IdentityAuthenticationGateway(userManager, signInManager);
+
+        var user = new ApplicationUser { UserName = Email, Email = Email, Name = "Owner", Identification = "1" };
+        Assert.True((await userManager.CreateAsync(user, CorrectPassword)).Succeeded);
+
+        for (var attempt = 1; attempt <= 3; attempt++)
+        {
+            await gateway.CheckCredentialsAsync(Email, WrongPassword, CancellationToken.None);
+        }
+
+        var lockoutEndBefore = await userManager.GetLockoutEndDateAsync(user);
+        var failedBefore = user.AccessFailedCount;
+
+        var wrongDuring = await gateway.CheckCredentialsAsync(Email, WrongPassword, CancellationToken.None);
+        var correctDuring = await gateway.CheckCredentialsAsync(Email, CorrectPassword, CancellationToken.None);
+
+        Assert.Equal(LoginOutcome.LockedOut, wrongDuring.Outcome);
+        Assert.Equal(LoginOutcome.LockedOut, correctDuring.Outcome);
+        Assert.Equal(lockoutEndBefore, await userManager.GetLockoutEndDateAsync(user));
+        Assert.Equal(failedBefore, user.AccessFailedCount);
+        Assert.Equal(lockoutEndBefore, correctDuring.LockoutEnd);
+    }}
 
 // Minimal in-memory Identity store used only by this test. It keeps the users in a list and implements the
 // interfaces that UserManager, SignInManager and the lockout logic need. Passwords are hashed by Identity itself.

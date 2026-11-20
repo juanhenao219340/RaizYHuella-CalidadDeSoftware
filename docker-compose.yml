@@ -2,6 +2,8 @@
 # Ninguna cadena de conexión, contraseña, capacidad ni zona horaria está escrita aquí:
 # todo proviene de variables definidas en el único .env versionado de la raíz.
 
+name: veterinaria
+
 services:
   postgres:
     image: postgres:16

@@ -31,11 +31,10 @@ public sealed class AppointmentsController(
     private const string DateFormat = "yyyy-MM-dd";
 
     private const string ReferenceNumberKey = "referenceNumber";
-    private const string PetIdentifierKey = "petIdentifier";
     private const string OwnerIdentificationKey = "ownerIdentification";
     private const string ServiceTypeKey = "serviceType";
 
-    private sealed record ListFilters(string? ReferenceNumber, string? PetIdentifier, string? OwnerIdentification, ServiceType? ServiceType);
+    private sealed record ListFilters(string? ReferenceNumber, string? OwnerIdentification, ServiceType? ServiceType);
 
     private static readonly Regex ReferenceNumberPattern = new(AppointmentSearchLimits.ReferenceNumberPattern, RegexOptions.CultureInvariant);
 
@@ -64,12 +63,11 @@ public sealed class AppointmentsController(
                 callerId,
                 callerRole,
                 filters.ReferenceNumber,
-                filters.PetIdentifier,
                 filters.OwnerIdentification,
                 filters.ServiceType),
             cancellationToken);
 
-        return Ok(appointments.Select(ToListItemResponse).ToList());
+        return Ok(appointments.Select(item => ToListItemResponse(item, callerRole)).ToList());
     }
 
     // Read-only for administrators and owners (D-A). Routed before any {id:guid} route.
@@ -209,11 +207,10 @@ public sealed class AppointmentsController(
     private bool TryReadListFilters(out ListFilters filters, out ValidationProblemDetails? problem)
     {
         var query = Request.Query;
-        filters = new ListFilters(null, null, null, null);
+        filters = new ListFilters(null, null, null);
         problem = null;
 
         if (!TryReadSingle(query, ReferenceNumberKey, out var referenceNumber, out problem)
-            || !TryReadSingle(query, PetIdentifierKey, out var petIdentifier, out problem)
             || !TryReadSingle(query, OwnerIdentificationKey, out var ownerIdentification, out problem)
             || !TryReadSingle(query, ServiceTypeKey, out var serviceType, out problem))
         {
@@ -224,12 +221,6 @@ public sealed class AppointmentsController(
             && (referenceNumber.Length > AppointmentSearchLimits.MaxReferenceNumberLength || !ReferenceNumberPattern.IsMatch(referenceNumber)))
         {
             problem = InvalidFilter(ReferenceNumberKey, "El radicado solo puede contener letras, números y guiones, y no superar 20 caracteres.");
-            return false;
-        }
-
-        if (petIdentifier is not null && petIdentifier.Length > AppointmentSearchLimits.MaxPetIdentifierLength)
-        {
-            problem = InvalidFilter(PetIdentifierKey, "El identificador de la mascota no puede superar 50 caracteres.");
             return false;
         }
 
@@ -252,7 +243,7 @@ public sealed class AppointmentsController(
             parsedServiceType = Enum.Parse<ServiceType>(serviceType);
         }
 
-        filters = new ListFilters(referenceNumber, petIdentifier, ownerIdentification, parsedServiceType);
+        filters = new ListFilters(referenceNumber, ownerIdentification, parsedServiceType);
         return true;
     }
 
@@ -284,7 +275,8 @@ public sealed class AppointmentsController(
             Extensions = { ["traceId"] = HttpContext.TraceIdentifier }
         };
 
-    private static AppointmentListItemResponse ToListItemResponse(AppointmentListItem item) =>
+    // OwnerName is exposed to administrators only (R19-1). Owners never receive it.
+    private static AppointmentListItemResponse ToListItemResponse(AppointmentListItem item, UserRole callerRole) =>
         new(
             item.Id,
             item.ReferenceNumber,
@@ -295,7 +287,8 @@ public sealed class AppointmentsController(
             item.ServiceType.ToString(),
             item.Date,
             item.StartTime,
-            item.Status.ToString());
+            item.Status.ToString(),
+            callerRole == UserRole.Administrator ? item.OwnerName : null);
 
     private bool TryGetCaller(out Guid callerId, out UserRole callerRole)
     {

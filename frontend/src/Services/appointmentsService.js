@@ -1,10 +1,9 @@
 import { request } from './apiClient'
 
 // Appointment endpoints. The owner comes from the JWT; ownerId is never sent (RF-PRO-09).
-export function listAppointments({ referenceNumber, petIdentifier, ownerIdentification, serviceType } = {}) {
+export function listAppointments({ referenceNumber, ownerIdentification, serviceType } = {}) {
   const params = new URLSearchParams()
   if (referenceNumber) params.set('referenceNumber', referenceNumber)
-  if (petIdentifier) params.set('petIdentifier', petIdentifier)
   if (ownerIdentification) params.set('ownerIdentification', ownerIdentification)
   if (serviceType) params.set('serviceType', serviceType)
   const query = params.toString()

@@ -10,11 +10,11 @@ import { cancelAppointment, getAvailability, listAppointments, updateAppointment
 import { listServices } from '../Services/servicesService'
 import { validateAppointmentFilters } from '../Services/validation'
 
-const EMPTY_FILTERS = {
-  referenceNumber: '',
-  petIdentifier: '',
-  ownerIdentification: '',
-  serviceType: '',
+// The owner identification filter exists only for the administrator (decision R17-1).
+function getEmptyFilters(isAdmin) {
+  return isAdmin
+    ? { referenceNumber: '', ownerIdentification: '', serviceType: '' }
+    : { referenceNumber: '', serviceType: '' }
 }
 
 // Codes after which the appointment is stale: the list is reloaded (RF-PRO-11, RF-PRO-07).
@@ -46,7 +46,7 @@ function showDialogError(err, fallbackMessage, setFormError, setReasonError) {
 function AppointmentsPage() {
   const { role } = useSession()
   const isAdmin = role === 'Administrator'
-  const [draft, setDraft] = useState(EMPTY_FILTERS)
+  const [draft, setDraft] = useState(() => getEmptyFilters(isAdmin))
   const [applied, setApplied] = useState({})
   const [draftErrors, setDraftErrors] = useState({})
   const [appointments, setAppointments] = useState([])
@@ -112,14 +112,14 @@ function AppointmentsPage() {
   }
 
   function handleSearch() {
-    const errors = validateAppointmentFilters(draft)
+    const errors = validateAppointmentFilters(draft, { showOwnerFilter: isAdmin })
     setDraftErrors(errors)
     if (Object.keys(errors).length > 0) return
-    setApplied(cleanFilters(draft))
+    setApplied(cleanFilters(isAdmin ? draft : { referenceNumber: draft.referenceNumber, serviceType: draft.serviceType }))
   }
 
   function handleClear() {
-    setDraft(EMPTY_FILTERS)
+    setDraft(getEmptyFilters(isAdmin))
     setDraftErrors({})
     setApplied({})
   }
@@ -213,6 +213,7 @@ function AppointmentsPage() {
         onSearch={handleSearch}
         onClear={handleClear}
         isBusy={isLoading}
+        isAdmin={isAdmin}
       />
 
       {loadError && <LoadErrorState message={loadError} onRetry={() => loadAppointments(applied)} />}

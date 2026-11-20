@@ -8,6 +8,10 @@ function AppointmentsTable({ appointments, isLoading = false, isAdmin = false, o
   const columns = [
     { key: 'referenceNumber', label: 'Radicado', render: (item) => item.referenceNumber },
     { key: 'petName', label: 'Mascota', render: (item) => item.petName },
+    // Owner column only for the administrator (R19-1). Owners see the table without it.
+    ...(isAdmin
+      ? [{ key: 'ownerName', label: 'Propietario', render: (item) => item.ownerName ?? '—' }]
+      : []),
     { key: 'serviceName', label: 'Servicio', render: (item) => item.serviceName },
     {
       key: 'dateTime',

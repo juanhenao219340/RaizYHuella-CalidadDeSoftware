@@ -13,4 +13,6 @@ public sealed record AppointmentListItem(
     ServiceType ServiceType,
     DateOnly Date,
     string StartTime,
-    AppointmentStatus Status);
+    AppointmentStatus Status,
+    // Owner's real name, also for deleted owners (R19-1). The API exposes it to administrators only.
+    string? OwnerName);

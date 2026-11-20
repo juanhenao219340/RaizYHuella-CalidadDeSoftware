@@ -54,10 +54,6 @@ public sealed class PetRepository(VeterinaryDbContext context) : IPetRepository
                     owner == null ? null : owner.Name,
                     owner == null ? null : owner.DeletedAt != null));
 
-    // Deleted pets keep their transformed identifier, which cannot collide with a real value (S-26).
-    public Task<bool> IdentifierExistsAsync(string identifier, CancellationToken cancellationToken) =>
-        context.Pets.AnyAsync(pet => pet.Identifier == identifier, cancellationToken);
-
     public async Task CreateAsync(Pet pet, CancellationToken cancellationToken)
     {
         context.Pets.Add(pet);

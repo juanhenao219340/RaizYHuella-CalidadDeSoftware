@@ -20,6 +20,9 @@ public sealed class ScheduleRepository(
     IAppointmentRepository appointments,
     ReferenceNumberSequenceCounter sequenceCounter) : IScheduleRepository
 {
+    // Rounds in which appointments that entered after the snapshot are added to a service deletion (D5).
+    private const int MaxDiscoveryRetries = 3;
+
     public async Task<Appointment> BookAsync(
         AppointmentRequest request,
         Guid ownerId,
@@ -47,6 +50,13 @@ public sealed class ScheduleRepository(
         await EnsureSlotControlAsync(slot, cancellationToken);
 
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+
+        // Locks the service row first, same order as DeleteServiceAsync (service, then slots), so the two never deadlock.
+        // Under the lock, a service deleted after the pre-check above is rejected with RF-REG-10 (R18-1, decision 1 A).
+        if (!await LockServiceAsync(request.ServiceId, cancellationToken))
+        {
+            throw new DomainRuleException("RF-REG-10", "El servicio está eliminado y no puede usarse para nuevas citas.");
+        }
 
         // Waits for any reschedule or cancel that holds this slot. Counts after the lock, so it sees their committed result.
         await TakeSlotsAsync([slot], cancellationToken);
@@ -177,6 +187,148 @@ public sealed class ScheduleRepository(
         return existing;
     }
 
+    // Cancels the confirmed future appointments of the service and deletes it in one transaction (R18-1, D3).
+    // Slot turns are taken first; appointments found under those turns are added to the set, at most MaxDiscoveryRetries times (D5).
+    public async Task<bool> DeleteServiceAsync(
+        Guid serviceId,
+        UserRole actorRole,
+        BusinessRulesOptions options,
+        DateTimeOffset nowUtc,
+        CancellationToken cancellationToken)
+    {
+        var serviceExists = await context.Services
+            .AsNoTracking()
+            .AnyAsync(candidate => candidate.Id == serviceId && candidate.DeletedAt == null, cancellationToken);
+
+        if (!serviceExists)
+        {
+            return false;
+        }
+
+        // Snapshot before the transaction. Slot rows are created here, outside the transaction, as in CancelAsync.
+        var captured = await FindFutureConfirmedAsync(serviceId, options, nowUtc, cancellationToken);
+
+        foreach (var slot in captured.Values.Select(snapshot => snapshot.Slot).Distinct())
+        {
+            await EnsureSlotControlAsync(slot, cancellationToken);
+        }
+
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
+
+        // Service row first, same order as BookAsync. Blocks bookings on this service until commit (decision 1 A).
+        // If another deletion committed first, the service is gone and nothing else is done.
+        if (!await LockServiceAsync(serviceId, cancellationToken))
+        {
+            return false;
+        }
+
+        var retries = 0;
+
+        while (true)
+        {
+            // Waits for any reschedule, cancel or booking that holds these slots. Counts after the locks, so it sees their committed result.
+            await TakeSlotsAsync(captured.Values.Select(snapshot => snapshot.Slot), cancellationToken);
+
+            var current = await FindFutureConfirmedAsync(serviceId, options, nowUtc, cancellationToken);
+
+            EnsureUnchanged(captured, current);
+
+            var discovered = current.Where(pair => !captured.ContainsKey(pair.Key)).ToList();
+
+            if (discovered.Count == 0)
+            {
+                break;
+            }
+
+            if (retries == MaxDiscoveryRetries)
+            {
+                throw new DomainRuleException(PersistenceErrors.ConcurrencyCode, PersistenceErrors.AppointmentModifiedMessage);
+            }
+
+            retries++;
+
+            foreach (var (appointmentId, snapshot) in discovered)
+            {
+                // Rows are not created inside the transaction: a unique violation would abort it. The client retries and the row is created before the transaction.
+                if (!await SlotControlExistsAsync(snapshot.Slot, cancellationToken))
+                {
+                    throw new DomainRuleException(PersistenceErrors.ConcurrencyCode, PersistenceErrors.AppointmentModifiedMessage);
+                }
+
+                captured.Add(appointmentId, snapshot);
+            }
+        }
+
+        var service = await context.Services.FirstOrDefaultAsync(candidate => candidate.Id == serviceId && candidate.DeletedAt == null, cancellationToken);
+
+        if (service is null)
+        {
+            return false;
+        }
+
+        // Tracked load under the turns. Version, status and slot must match the snapshot (RF-PRO-11).
+        var tracked = await context.Appointments
+            .Where(candidate => captured.Keys.Contains(candidate.Id))
+            .ToListAsync(cancellationToken);
+
+        if (tracked.Count != captured.Count)
+        {
+            throw new DomainRuleException(PersistenceErrors.ConcurrencyCode, PersistenceErrors.AppointmentModifiedMessage);
+        }
+
+        foreach (var appointment in tracked)
+        {
+            var expected = captured[appointment.Id];
+
+            EnsureSameVersion(appointment, expected);
+            EnsureSameSlot(appointment, expected.Slot);
+            appointment.Cancel(actorRole, AppointmentModificationRules.ServiceDeletedReason, nowUtc);
+        }
+
+        service.Delete(nowUtc);
+
+        await PersistenceErrors.SaveChangesAsync(context, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        return true;
+    }
+
+    // Confirmed future appointments of the service, read without tracking and filtered by the domain selection rule (D2).
+    private async Task<Dictionary<Guid, AppointmentSnapshot>> FindFutureConfirmedAsync(
+        Guid serviceId,
+        BusinessRulesOptions options,
+        DateTimeOffset nowUtc,
+        CancellationToken cancellationToken)
+    {
+        var rows = await context.Appointments
+            .AsNoTracking()
+            .Where(candidate => candidate.ServiceId == serviceId && candidate.Status == AppointmentStatus.Confirmed)
+            .ToListAsync(cancellationToken);
+
+        return rows
+            .Where(candidate => AppointmentModificationRules.IsFutureConfirmed(candidate, nowUtc, options))
+            .ToDictionary(
+                candidate => candidate.Id,
+                candidate => new AppointmentSnapshot(
+                    new SlotKey(candidate.Date, candidate.StartTime, candidate.ServiceId),
+                    candidate.Version,
+                    candidate.Status));
+    }
+
+    // Every captured appointment must still be found with the same version, status and slot. Any change is a version conflict (RF-PRO-11).
+    private static void EnsureUnchanged(
+        Dictionary<Guid, AppointmentSnapshot> captured,
+        Dictionary<Guid, AppointmentSnapshot> current)
+    {
+        foreach (var (appointmentId, snapshot) in captured)
+        {
+            if (!current.TryGetValue(appointmentId, out var latest) || latest != snapshot)
+            {
+                throw new DomainRuleException(PersistenceErrors.ConcurrencyCode, PersistenceErrors.AppointmentModifiedMessage);
+            }
+        }
+    }
+
     // Tracked load for the business checks. Status and Version are the concurrency tokens checked on save.
     private Task<Appointment?> LoadFreshAsync(Guid appointmentId, CancellationToken cancellationToken) =>
         context.Appointments.FirstOrDefaultAsync(appointment => appointment.Id == appointmentId, cancellationToken);
@@ -230,6 +382,18 @@ public sealed class ScheduleRepository(
             .AnyAsync(control => control.Date == slot.Date
                 && control.StartTime == slot.StartTime
                 && control.ServiceId == slot.ServiceId, cancellationToken);
+
+    // Takes the service row lock for the rest of the transaction (decision 1 A). Returns false when the service is missing or soft-deleted.
+    // Uses ExecuteUpdateAsync, the same mechanism as TakeSlotsAsync: the UPDATE holds the row lock until commit or rollback.
+    // The value written is the column's own value, so no data changes.
+    private async Task<bool> LockServiceAsync(Guid serviceId, CancellationToken cancellationToken)
+    {
+        var locked = await context.Services
+            .Where(service => service.Id == serviceId && service.DeletedAt == null)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(service => service.DeletedAt, service => service.DeletedAt), cancellationToken);
+
+        return locked == 1;
+    }
 
     // Takes the turn of each distinct slot in fixed order. The UPDATE holds the row lock until commit or rollback (R13-4).
     private async Task TakeSlotsAsync(IEnumerable<SlotKey> slots, CancellationToken cancellationToken)

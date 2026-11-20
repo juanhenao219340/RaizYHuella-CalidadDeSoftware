@@ -35,11 +35,49 @@ public sealed class AuthController(
         Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
     };
 
+    // RN-05 lockout (R15-1, D-1, D-2, D-5): 423 with the remaining time, also sent as Retry-After.
+    private static ProblemDetails LockedOutProblem(int retryAfterSeconds)
+    {
+        var problem = new ProblemDetails
+        {
+            Status = StatusCodes.Status423Locked,
+            Title = "Cuenta bloqueada por intentos fallidos.",
+            Detail = LockoutDetail(retryAfterSeconds),
+            Type = "https://tools.ietf.org/html/rfc4918#section-11.3"
+        };
+        problem.Extensions["retryAfterSeconds"] = retryAfterSeconds;
+        problem.Extensions["code"] = "RN-05";
+        return problem;
+    }
+
+    // "Intente de nuevo en {N} minutos y {M} segundos." with singular/plural and zero parts omitted.
+    private static string LockoutDetail(int seconds)
+    {
+        var minutes = seconds / 60;
+        var remainderSeconds = seconds % 60;
+
+        if (minutes == 0)
+        {
+            return $"Intente de nuevo en {Plural(remainderSeconds, "segundo", "segundos")}.";
+        }
+
+        if (remainderSeconds == 0)
+        {
+            return $"Intente de nuevo en {Plural(minutes, "minuto", "minutos")}.";
+        }
+
+        return $"Intente de nuevo en {Plural(minutes, "minuto", "minutos")} y {Plural(remainderSeconds, "segundo", "segundos")}.";
+    }
+
+    private static string Plural(int count, string singular, string plural) =>
+        $"{count} {(count == 1 ? singular : plural)}";
+
     [HttpPost("login")]
     [AllowAnonymous]
     [ProducesResponseType<LoginResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status423Locked)]
     public async Task<IActionResult> Login([FromBody] LoginRequest? request, CancellationToken cancellationToken)
     {
         if (!basicCredentials.IsValid(Request))
@@ -60,15 +98,18 @@ public sealed class AuthController(
 
         var result = await loginHandler.HandleAsync(request.Email, request.Password, cancellationToken);
 
-        if (result.Outcome is LoginOutcome.LockedOut)
+        // A lockout without a known remaining time cannot be described; it falls back to the generic 401 (RNF-SEG-06).
+        if (result.Outcome is LoginOutcome.LockedOut && result.RetryAfterSeconds is { } retryAfterSeconds)
         {
-            return Unauthorized(InvalidCredentialsProblem());
+            Response.Headers["Retry-After"] = retryAfterSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return StatusCode(StatusCodes.Status423Locked, LockedOutProblem(retryAfterSeconds));
         }
 
         if (result.Outcome is not LoginOutcome.Succeeded || result.UserId is not { } userId || result.Role is not { } role)
         {
             return Unauthorized(InvalidCredentialsProblem());
         }
+
 
         var token = tokenService.Issue(userId, role);
         var roleName = RoleNames.FromRole(role);

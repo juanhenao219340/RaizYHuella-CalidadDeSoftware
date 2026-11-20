@@ -78,7 +78,6 @@ public sealed class PetsController(
 
         var pet = await createPetHandler.HandleAsync(
             new CreatePetCommand(
-                request.Identifier,
                 request.Name,
                 request.Species,
                 request.Breed,
@@ -155,7 +154,6 @@ public sealed class PetsController(
 
         return new PetResponse(
             pet.Id,
-            pet.Identifier,
             pet.Name,
             pet.Species,
             pet.Breed,

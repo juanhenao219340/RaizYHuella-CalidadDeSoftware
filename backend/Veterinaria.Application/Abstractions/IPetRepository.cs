@@ -19,8 +19,6 @@ public interface IPetRepository
 
     Task<PetWithOwner?> GetByIdWithOwnerAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<bool> IdentifierExistsAsync(string identifier, CancellationToken cancellationToken);
-
     Task CreateAsync(Pet pet, CancellationToken cancellationToken);
 
     Task UpdateAsync(Pet pet, CancellationToken cancellationToken);

@@ -75,6 +75,5 @@ export function getConflictField(error) {
   const text = (error.message ?? '').toLowerCase()
   if (text.includes('identificación')) return 'identification'
   if (text.includes('correo')) return 'email'
-  if (text.includes('identificador')) return 'identifier'
   return null
 }

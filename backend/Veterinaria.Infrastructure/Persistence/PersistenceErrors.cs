@@ -73,7 +73,6 @@ public static class PersistenceErrors
             {
                 "IX_AspNetUsers_Identification" => new DomainRuleException("RF-REG-06", "La identificación ya está registrada."),
                 "IX_AspNetUsers_NormalizedEmail" => new DomainRuleException("RF-REG-06", "El correo ya está registrado."),
-                "IX_Pets_Identifier" => new DomainRuleException("RF-REG-06", "El identificador de la mascota ya está registrado."),
                 "IX_Appointments_ReferenceNumber" => new DomainRuleException("RF-PRO-03", "El número de radicado ya existe."),
                 "IX_Appointments_Pet_Slot_Confirmed" => new DomainRuleException(
                     "P-02",

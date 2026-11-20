@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Veterinaria.Api.Contracts;
 using Veterinaria.Application.Services;
 using Veterinaria.Domain.Entities;
+using Veterinaria.Domain.Enumerations;
 
 namespace Veterinaria.Api.Controllers;
 
@@ -76,9 +77,11 @@ public sealed class ServicesController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var deleted = await deleteServiceHandler.HandleAsync(id, cancellationToken);
+        // Only administrators reach this action (policy), so the actor role is Administrator by construction.
+        var deleted = await deleteServiceHandler.HandleAsync(new DeleteServiceCommand(id, UserRole.Administrator), cancellationToken);
 
         return deleted ? NoContent() : NotFoundService();
     }

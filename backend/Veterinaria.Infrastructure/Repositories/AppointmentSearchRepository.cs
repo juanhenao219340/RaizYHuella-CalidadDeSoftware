@@ -19,18 +19,15 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
         var appointments = context.Appointments
             .AsNoTracking()
             .Join(context.Pets, appointment => appointment.PetId, pet => pet.Id, (appointment, pet) => new { Appointment = appointment, Pet = pet })
-            .Join(context.Services, row => row.Appointment.ServiceId, service => service.Id, (row, service) => new { row.Appointment, row.Pet, Service = service });
+            .Join(context.Services, row => row.Appointment.ServiceId, service => service.Id, (row, service) => new { row.Appointment, row.Pet, Service = service })
+            // LEFT JOIN to the owner (R19-1): owner name in the same statement, no per-row query. Deleted owners are kept.
+            .GroupJoin(context.Users, row => row.Pet.OwnerId, user => user.Id, (row, owners) => new { row.Appointment, row.Pet, row.Service, Owners = owners })
+            .SelectMany(row => row.Owners.DefaultIfEmpty(), (row, owner) => new { row.Appointment, row.Pet, row.Service, OwnerName = owner == null ? null : owner.Name });
 
         // Scope first (RF-CON-05). Deleted pets, services and owners are not filtered out (RF-REG-10 f, g).
         if (criteria.OwnerId is { } ownerId)
         {
             appointments = appointments.Where(row => row.Pet.OwnerId == ownerId);
-        }
-
-        if (criteria.PetIdentifier is { } petIdentifier)
-        {
-            var pattern = LikePattern.Contains(petIdentifier);
-            appointments = appointments.Where(row => EF.Functions.ILike(row.Pet.Identifier, pattern, LikePattern.EscapeCharacter));
         }
 
         if (criteria.OwnerIdentification is { } ownerIdentification)
@@ -66,7 +63,8 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
                 row.Service.Type,
                 row.Appointment.Date,
                 row.Appointment.StartTime,
-                row.Appointment.Status))
+                row.Appointment.Status,
+                row.OwnerName))
             .ToListAsync(cancellationToken);
 
         return rows
@@ -80,7 +78,8 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
                 row.ServiceType,
                 row.Date,
                 row.StartTime.ToString(),
-                row.Status))
+                row.Status,
+                row.OwnerName))
             .ToList();
     }
 
@@ -95,5 +94,6 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
         ServiceType ServiceType,
         DateOnly Date,
         TimeSlot StartTime,
-        AppointmentStatus Status);
+        AppointmentStatus Status,
+        string? OwnerName);
 }

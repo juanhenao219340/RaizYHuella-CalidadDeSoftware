@@ -8,7 +8,6 @@ public sealed record ListAppointmentsQuery(
     Guid CallerId,
     UserRole CallerRole,
     string? ReferenceNumber,
-    string? PetIdentifier,
     string? OwnerIdentification,
     ServiceType? ServiceType);
 
@@ -29,7 +28,6 @@ public sealed class ListAppointmentsHandler(IAppointmentSearchRepository searchR
 
         var criteria = new AppointmentSearchCriteria(
             query.ReferenceNumber,
-            query.PetIdentifier,
             query.OwnerIdentification,
             query.ServiceType,
             ownerId);

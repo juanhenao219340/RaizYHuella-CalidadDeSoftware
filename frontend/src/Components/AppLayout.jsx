@@ -52,9 +52,9 @@ function AppLayout({ user = null, role = null, onLogout }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
           <div className="flex items-center gap-2">
             <img
-              src="/gemini-svg.svg"
+              src="/logo.svg"
               alt="Logotipo de Raíz y Huella"
-              className="h-8 w-8 max-md:h-7 max-md:w-7"
+              className="h-16 w-16 max-md:h-12 max-md:w-12"
             />
             <span className="font-bold">Raíz y Huella</span>
           </div>

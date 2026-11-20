@@ -62,6 +62,7 @@ public sealed record AppointmentResponse(
 public sealed record SlotAvailabilityResponse(string StartTime, int RemainingSlots, bool Available);
 
 // Read model for GET /api/appointments (T-07). No owner identification, e-mail or OwnerId is exposed.
+// OwnerName (R19-1) is filled only for administrators; it is null for owners.
 public sealed record AppointmentListItemResponse(
     Guid Id,
     string ReferenceNumber,
@@ -72,13 +73,13 @@ public sealed record AppointmentListItemResponse(
     string ServiceType,
     DateOnly Date,
     string StartTime,
-    string Status);
+    string Status,
+    string? OwnerName);
 
-// Limits of the appointment search filters (T-07 section 6). Column lengths: Appointments.ReferenceNumber, Pets.Identifier, AspNetUsers.Identification.
+// Limits of the appointment search filters (T-07 section 6). Column lengths: Appointments.ReferenceNumber, AspNetUsers.Identification.
 public static class AppointmentSearchLimits
 {
     public const int MaxReferenceNumberLength = 20;
-    public const int MaxPetIdentifierLength = 50;
     public const int MaxOwnerIdentificationLength = 20;
 
     public const string ReferenceNumberPattern = "^[A-Za-z0-9-]+\\z";

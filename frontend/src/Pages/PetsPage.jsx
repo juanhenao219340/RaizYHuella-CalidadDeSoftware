@@ -76,7 +76,6 @@ function PetsPage() {
   }
 
   const columns = [
-    { key: 'identifier', label: 'Identificador', render: (pet) => pet.identifier },
     { key: 'name', label: 'Nombre', render: (pet) => pet.name },
     { key: 'species', label: 'Especie', render: (pet) => pet.species },
     { key: 'breed', label: 'Raza', render: (pet) => pet.breed },

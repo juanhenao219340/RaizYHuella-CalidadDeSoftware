@@ -96,12 +96,6 @@ export function validateProfile(values) {
 
 export function validatePetCreate(values) {
   const errors = {}
-  const identifier = cleanText(values.identifier)
-  errors.identifier = !identifier
-    ? 'El identificador de la mascota es obligatorio.'
-    : identifier.length > 50
-      ? 'El identificador no puede superar 50 caracteres.'
-      : validateDelPrefix(identifier)
   validatePetFields(values, errors)
   return compact(errors)
 }
@@ -183,7 +177,8 @@ export function validateReason(value, kind = 'cancel') {
   return ''
 }
 
-export function validateAppointmentFilters({ referenceNumber, petIdentifier, ownerIdentification }) {
+// ownerIdentification is validated only when its filter is visible (administrator, decision R17-1).
+export function validateAppointmentFilters({ referenceNumber, ownerIdentification }, { showOwnerFilter = false } = {}) {
   const errors = {}
   const reference = cleanText(referenceNumber)
   addIfInvalid(
@@ -192,17 +187,13 @@ export function validateAppointmentFilters({ referenceNumber, petIdentifier, own
     reference.length > 20 || !REFERENCE_PATTERN.test(reference),
     'El radicado solo puede contener letras, números y guiones, y no superar 20 caracteres.',
   )
-  addIfInvalid(
-    errors,
-    'petIdentifier',
-    cleanText(petIdentifier).length > 50,
-    'El identificador de la mascota no puede superar 50 caracteres.',
-  )
-  addIfInvalid(
-    errors,
-    'ownerIdentification',
-    cleanText(ownerIdentification).length > 20,
-    'La identificación del propietario no puede superar 20 caracteres.',
-  )
+  if (showOwnerFilter) {
+    addIfInvalid(
+      errors,
+      'ownerIdentification',
+      cleanText(ownerIdentification).length > 20,
+      'La identificación del propietario no puede superar 20 caracteres.',
+    )
+  }
   return compact(errors)
 }

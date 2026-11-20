@@ -6,8 +6,6 @@ public class Pet
 {
     public Guid Id { get; private set; }
 
-    public string Identifier { get; private set; } = string.Empty;
-
     public string Name { get; private set; } = string.Empty;
 
     public string Species { get; private set; } = string.Empty;
@@ -26,12 +24,11 @@ public class Pet
     {
     }
 
-    public Pet(Guid id, string identifier, string name, string species, string breed, DateOnly birthDate, Guid ownerId)
+    public Pet(Guid id, string name, string species, string breed, DateOnly birthDate, Guid ownerId)
     {
         var candidate = new Pet
         {
             Id = id,
-            Identifier = identifier,
             Name = name,
             Species = species,
             Breed = breed,
@@ -42,7 +39,6 @@ public class Pet
         Validate(candidate).ThrowIfFailed();
 
         Id = candidate.Id;
-        Identifier = candidate.Identifier;
         Name = candidate.Name;
         Species = candidate.Species;
         Breed = candidate.Breed;
@@ -60,7 +56,6 @@ public class Pet
         var candidate = new Pet
         {
             Id = Id,
-            Identifier = Identifier,
             Name = name,
             Species = species,
             Breed = breed,
@@ -76,28 +71,26 @@ public class Pet
         BirthDate = candidate.BirthDate;
     }
 
-    // Logical deletion (RF-REG-10). The identifier is replaced so the original value can be reused (S-26).
-    public void Delete(Guid releaseToken, DateTimeOffset deletedAt)
+    // Logical deletion (RF-REG-10). The pet has no identifier to release.
+    public void Delete(DateTimeOffset deletedAt)
     {
         if (IsDeleted)
         {
             throw new DomainRuleException("RF-REG-10", "La mascota ya está eliminada.");
         }
 
-        Identifier = $"DEL-{releaseToken:N}";
         DeletedAt = deletedAt;
     }
 
     public static DomainResult Validate(Pet pet)
     {
-        var emptyFields = string.IsNullOrWhiteSpace(pet.Identifier)
-            || string.IsNullOrWhiteSpace(pet.Name)
+        var emptyFields = string.IsNullOrWhiteSpace(pet.Name)
             || string.IsNullOrWhiteSpace(pet.Species)
             || string.IsNullOrWhiteSpace(pet.Breed);
 
         if (emptyFields || pet.OwnerId == Guid.Empty)
         {
-            return DomainResult.Failed("RF-REG-05", "El identificador, nombre, especie, raza y propietario de la mascota son obligatorios.");
+            return DomainResult.Failed("RF-REG-05", "El nombre, especie, raza y propietario de la mascota son obligatorios.");
         }
 
         return DomainResult.Success();

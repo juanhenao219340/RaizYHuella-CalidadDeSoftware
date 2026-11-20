@@ -55,7 +55,7 @@ function PetsReadOnlyPage() {
     const term = query.trim().toLowerCase()
     if (!term) return pets
     return pets.filter((pet) =>
-      [pet.identifier, pet.name].some((value) => (value ?? '').toLowerCase().includes(term)),
+      [pet.name].some((value) => (value ?? '').toLowerCase().includes(term)),
     )
   }, [pets, query])
 
@@ -73,7 +73,6 @@ function PetsReadOnlyPage() {
   }
 
   const columns = [
-    { key: 'identifier', label: 'Identificador', render: (pet) => pet.identifier },
     { key: 'name', label: 'Nombre', render: (pet) => pet.name },
     { key: 'owner', label: 'Propietario', render: (pet) => <OwnerCell pet={pet} /> },
     { key: 'species', label: 'Especie', render: (pet) => pet.species },
@@ -134,8 +133,6 @@ function PetsReadOnlyPage() {
           )}
           {!isLoadingDetail && !detailError && (
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-              <dt className="font-semibold">Identificador</dt>
-              <dd>{detail.identifier}</dd>
               <dt className="font-semibold">Nombre</dt>
               <dd>{detail.name}</dd>
               <dt className="font-semibold">Especie</dt>

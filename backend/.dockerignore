@@ -1,0 +1,6 @@
+# Excluir artefactos de compilación generados en el host
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+**/.git

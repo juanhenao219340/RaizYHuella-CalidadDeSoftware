@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand (5 bis.1) */
+  --color-primary: #2F5D62;
+  --color-primary-dark: #234649;
+  --color-primary-light: #E6EEEE;
+  --color-earth: #9A6D45;
+
+  /* Surfaces and text */
+  --color-text: #2B2B2B;
+  --color-surface: #FAF8F4;
+  --color-surface-muted: #F1EDE6;
+  --color-border: #958F86;
+
+  /* Status (always paired with text, never color alone) */
+  --color-success: #3B6E4A;
+  --color-warning: #8A5A00;
+  --color-danger: #9B2C2C;
+
+  /* Typography (5 bis.3): Source Sans 3, self-hosted via @fontsource in main.jsx */
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    @apply bg-surface text-text font-sans antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

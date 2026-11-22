@@ -19,6 +19,7 @@ public static class IdentityConfiguration
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(lockout.LockoutMinutes);
 
         options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters = string.Empty;
 
         options.SignIn.RequireConfirmedAccount = false;
     }

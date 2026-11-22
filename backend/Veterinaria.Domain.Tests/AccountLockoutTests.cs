@@ -20,6 +20,25 @@ public class AccountLockoutTests
     private const string WrongPassword = "Wrong-Passw0rd";
 
     [Fact]
+    public async Task EmailWithValidSpecialCharacters_CanBeUsedAsUserName()
+    {
+        var lockout = new DomainLockoutOptions { MaxFailedAttempts = 3, LockoutMinutes = 2 };
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.Configure<IdentityOptions>(options => IdentityConfiguration.Apply(options, lockout));
+        services.AddSingleton<IUserStore<ApplicationUser>, InMemoryUserStore>();
+        services.AddIdentityCore<ApplicationUser>();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = new ApplicationUser { UserName = "owner!test@example.com", Email = "owner!test@example.com", Name = "Owner", Identification = "1" };
+
+        Assert.True((await userManager.CreateAsync(user, CorrectPassword)).Succeeded);
+        Assert.True((await userManager.SetUserNameAsync(user, "updated!owner@example.com")).Succeeded);
+    }
+
+    [Fact]
     public async Task FourthAttempt_IsRejected_WhileLockoutLasts_AfterThreeFailedAttempts()
     {
         // Same values as the RN-S5 configuration, mapped by the real IdentityConfiguration.Apply.

@@ -276,6 +276,32 @@ docker compose stop
 
 `docker compose down` detiene y elimina los contenedores, pero no borra el volumen de datos. Úselo solo cuando sea necesario, por ejemplo para recrear los contenedores después de cambiar la configuración.
 
+Reiniciar el entorno completamente desde cero
+
+Si desea reiniciar el MVP desde cero para realizar nuevamente las pruebas, eliminando los contenedores, las imágenes construidas localmente y los datos almacenados en PostgreSQL, ejecute los siguientes comandos desde la raíz del repositorio:
+
+```powershell
+docker compose down -v --rmi local --remove-orphans
+docker compose build --no-cache
+docker compose up -d
+```
+
+Esto realiza lo siguiente:
+
+Elimina los contenedores del proyecto.
+
+Elimina el volumen postgres_data, borrando todos los datos de la base de datos.
+
+Elimina las imágenes construidas localmente por Docker Compose.
+
+Elimina contenedores huérfanos asociados al proyecto.
+
+Reconstruye las imágenes sin utilizar la caché de construcción.
+
+Levanta nuevamente PostgreSQL, backend y frontend, ejecutando el proceso de inicialización del sistema como en una instalación nueva.
+
+Advertencia: esta operación elimina definitivamente los datos almacenados en la base de datos del entorno. No use estos comandos si desea conservar propietarios, mascotas, servicios o citas existentes.
+
 ## 8. Pruebas
 
 El proyecto `backend\Veterinaria.Domain.Tests` contiene pruebas automatizadas (xUnit) de las reglas de dominio: radicado, fecha y hora, cupos, franja no disponible, motivo, P-02 y horario de 08:00 a 17:00. Incluye también una prueba del bloqueo de cuenta (RN-05) que usa ASP.NET Core Identity en memoria.

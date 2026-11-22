@@ -151,7 +151,7 @@ builder.Services.AddCors(options => options.AddPolicy("frontend", policy => poli
     .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")
     .WithHeaders("Content-Type", "Authorization")));
 
-// Enums are read and written as text: Clinic, Grooming, Recreation (D-10).
+// Enums are read and written as text: Clinic, Aesthetics, Recreation (D-10).
 builder.Services.AddControllers(options =>
     {
         // Framework-generated binding messages are translated at the source (RNF-IDI-01, D-12).

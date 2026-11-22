@@ -11,7 +11,7 @@ public sealed record ServiceRequest
     [StringLength(MaxNameLength, ErrorMessage = "El nombre no puede superar 100 caracteres.")]
     public string Name { get; init; } = string.Empty;
 
-    // Serialized as text: Clinic, Grooming or Recreation (D-10, JsonStringEnumConverter in Program.cs).
+    // Serialized as text: Clinic, Aesthetics or Recreation (D-10, JsonStringEnumConverter in Program.cs).
     [Required(ErrorMessage = "El tipo de servicio es obligatorio.")]
     public ServiceType? Type { get; init; }
 }

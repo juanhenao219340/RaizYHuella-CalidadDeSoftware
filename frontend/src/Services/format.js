@@ -7,7 +7,7 @@ export const ROLE_LABELS = {
 
 export const SERVICE_TYPE_LABELS = {
   Clinic: 'Clínica',
-  Grooming: 'Peluquería',
+  Aesthetics: 'Estética',
   Recreation: 'Recreación',
 }
 

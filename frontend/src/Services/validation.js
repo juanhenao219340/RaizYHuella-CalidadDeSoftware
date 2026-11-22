@@ -13,7 +13,7 @@ const REFERENCE_PATTERN = /^[A-Za-z0-9-]*$/
 const PASSWORD_UPPER = /[A-Z]/
 const PASSWORD_LOWER = /[a-z]/
 const PASSWORD_DIGIT = /\d/
-const SERVICE_TYPES = ['Clinic', 'Grooming', 'Recreation']
+const SERVICE_TYPES = ['Clinic', 'Aesthetics', 'Recreation']
 
 export function cleanText(value) {
   return typeof value === 'string' ? value.trim() : ''

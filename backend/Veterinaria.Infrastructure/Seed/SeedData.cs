@@ -12,7 +12,7 @@ namespace Veterinaria.Infrastructure.Seed;
 public static class SeedData
 {
     public static readonly Guid ClinicId = new("6f1a0c2e-1b7d-4c8a-9e22-000000000001");
-    public static readonly Guid GroomingId = new("6f1a0c2e-1b7d-4c8a-9e22-000000000002");
+    public static readonly Guid AestheticsId = new("6f1a0c2e-1b7d-4c8a-9e22-000000000002");
     public static readonly Guid RecreationId = new("6f1a0c2e-1b7d-4c8a-9e22-000000000003");
 
     public static async Task EnsureRolesAsync(RoleManager<IdentityRole<Guid>> roleManager)
@@ -26,7 +26,7 @@ public static class SeedData
         var defaults = new (Guid Id, string Name, ServiceType Type)[]
         {
             (ClinicId, "Clínica", ServiceType.Clinic),
-            (GroomingId, "Estética", ServiceType.Grooming),
+            (AestheticsId, "Estética", ServiceType.Aesthetics),
             (RecreationId, "Recreación", ServiceType.Recreation)
         };
 

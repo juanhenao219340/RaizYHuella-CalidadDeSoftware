@@ -348,6 +348,6 @@ Todas las rutas usan el prefijo `/api`, reciben y devuelven JSON en camelCase, y
 Notas:
 
 - Las fechas van en formato `yyyy-MM-dd` y las horas de inicio en `HH:mm`, de 08:00 a 17:00.
-- Los tipos de servicio son `Clinic` (clínica), `Grooming` (estética) y `Recreation` (recreación).
+- Los tipos de servicio son `Clinic` (clínica), `Aesthetics` (estética) y `Recreation` (recreación).
 - Un propietario que pide un recurso ajeno recibe 404 genérico. En el listado de citas, un filtro con datos ajenos devuelve una lista vacía.
 - Las respuestas nunca incluyen contraseñas ni hashes.

@@ -281,7 +281,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Services", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Services_Type", "\"Type\" IN ('Clinic', 'Grooming', 'Recreation')");
+                            t.HasCheckConstraint("CK_Services_Type", "\"Type\" IN ('Clinic', 'Aesthetics', 'Recreation')");
                         });
                 });
 

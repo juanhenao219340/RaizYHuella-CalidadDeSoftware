@@ -236,7 +236,7 @@ public sealed class AppointmentsController(
         {
             if (!Enum.GetNames<ServiceType>().Contains(serviceType, StringComparer.Ordinal))
             {
-                problem = InvalidFilter(ServiceTypeKey, "El tipo de servicio debe ser Clinic, Grooming o Recreation.");
+                problem = InvalidFilter(ServiceTypeKey, "El tipo de servicio debe ser Clinic, Aesthetics o Recreation.");
                 return false;
             }
 

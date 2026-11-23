@@ -30,6 +30,12 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
             appointments = appointments.Where(row => row.Pet.OwnerId == ownerId);
         }
 
+        if (criteria.PetName is { } petName)
+        {
+            var pattern = LikePattern.Contains(petName);
+            appointments = appointments.Where(row => EF.Functions.ILike(row.Pet.Name, pattern, LikePattern.EscapeCharacter));
+        }
+
         if (criteria.OwnerIdentification is { } ownerIdentification)
         {
             var pattern = LikePattern.Contains(ownerIdentification);

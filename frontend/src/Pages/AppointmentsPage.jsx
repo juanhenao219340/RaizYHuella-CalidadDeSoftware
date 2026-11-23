@@ -13,8 +13,8 @@ import { validateAppointmentFilters } from '../Services/validation'
 // The owner identification filter exists only for the administrator (decision R17-1).
 function getEmptyFilters(isAdmin) {
   return isAdmin
-    ? { referenceNumber: '', ownerIdentification: '', serviceType: '' }
-    : { referenceNumber: '', serviceType: '' }
+    ? { referenceNumber: '', petName: '', ownerIdentification: '', serviceType: '' }
+    : { referenceNumber: '', petName: '', serviceType: '' }
 }
 
 // Codes after which the appointment is stale: the list is reloaded (RF-PRO-11, RF-PRO-07).
@@ -115,7 +115,7 @@ function AppointmentsPage() {
     const errors = validateAppointmentFilters(draft, { showOwnerFilter: isAdmin })
     setDraftErrors(errors)
     if (Object.keys(errors).length > 0) return
-    setApplied(cleanFilters(isAdmin ? draft : { referenceNumber: draft.referenceNumber, serviceType: draft.serviceType }))
+    setApplied(cleanFilters(isAdmin ? draft : { referenceNumber: draft.referenceNumber, petName: draft.petName, serviceType: draft.serviceType }))
   }
 
   function handleClear() {

@@ -31,10 +31,11 @@ public sealed class AppointmentsController(
     private const string DateFormat = "yyyy-MM-dd";
 
     private const string ReferenceNumberKey = "referenceNumber";
+    private const string PetNameKey = "petName";
     private const string OwnerIdentificationKey = "ownerIdentification";
     private const string ServiceTypeKey = "serviceType";
 
-    private sealed record ListFilters(string? ReferenceNumber, string? OwnerIdentification, ServiceType? ServiceType);
+    private sealed record ListFilters(string? ReferenceNumber, string? PetName, string? OwnerIdentification, ServiceType? ServiceType);
 
     private static readonly Regex ReferenceNumberPattern = new(AppointmentSearchLimits.ReferenceNumberPattern, RegexOptions.CultureInvariant);
 
@@ -63,6 +64,7 @@ public sealed class AppointmentsController(
                 callerId,
                 callerRole,
                 filters.ReferenceNumber,
+                filters.PetName,
                 filters.OwnerIdentification,
                 filters.ServiceType),
             cancellationToken);
@@ -207,10 +209,11 @@ public sealed class AppointmentsController(
     private bool TryReadListFilters(out ListFilters filters, out ValidationProblemDetails? problem)
     {
         var query = Request.Query;
-        filters = new ListFilters(null, null, null);
+        filters = new ListFilters(null, null, null, null);
         problem = null;
 
         if (!TryReadSingle(query, ReferenceNumberKey, out var referenceNumber, out problem)
+            || !TryReadSingle(query, PetNameKey, out var petName, out problem)
             || !TryReadSingle(query, OwnerIdentificationKey, out var ownerIdentification, out problem)
             || !TryReadSingle(query, ServiceTypeKey, out var serviceType, out problem))
         {
@@ -230,6 +233,12 @@ public sealed class AppointmentsController(
             return false;
         }
 
+        if (petName is not null && petName.Length > AppointmentSearchLimits.MaxPetNameLength)
+        {
+            problem = InvalidFilter(PetNameKey, "El nombre de la mascota no puede superar 100 caracteres.");
+            return false;
+        }
+
         ServiceType? parsedServiceType = null;
 
         if (serviceType is not null)
@@ -243,7 +252,7 @@ public sealed class AppointmentsController(
             parsedServiceType = Enum.Parse<ServiceType>(serviceType);
         }
 
-        filters = new ListFilters(referenceNumber, ownerIdentification, parsedServiceType);
+        filters = new ListFilters(referenceNumber, petName, ownerIdentification, parsedServiceType);
         return true;
     }
 

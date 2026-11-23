@@ -6,6 +6,7 @@ namespace Veterinaria.Application.Appointments;
 // OwnerId is null for administrators and holds the JWT subject for owners; it is always applied first in the query.
 public sealed record AppointmentSearchCriteria(
     string? ReferenceNumber,
+    string? PetName,
     string? OwnerIdentification,
     ServiceType? ServiceType,
     Guid? OwnerId);

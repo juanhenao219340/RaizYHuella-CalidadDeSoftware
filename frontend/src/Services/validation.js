@@ -178,7 +178,7 @@ export function validateReason(value, kind = 'cancel') {
 }
 
 // ownerIdentification is validated only when its filter is visible (administrator, decision R17-1).
-export function validateAppointmentFilters({ referenceNumber, ownerIdentification }, { showOwnerFilter = false } = {}) {
+export function validateAppointmentFilters({ referenceNumber, petName, ownerIdentification }, { showOwnerFilter = false } = {}) {
   const errors = {}
   const reference = cleanText(referenceNumber)
   addIfInvalid(
@@ -186,6 +186,12 @@ export function validateAppointmentFilters({ referenceNumber, ownerIdentificatio
     'referenceNumber',
     reference.length > 20 || !REFERENCE_PATTERN.test(reference),
     'El radicado solo puede contener letras, números y guiones, y no superar 20 caracteres.',
+  )
+  addIfInvalid(
+    errors,
+    'petName',
+    cleanText(petName).length > 100,
+    'El nombre de la mascota no puede superar 100 caracteres.',
   )
   if (showOwnerFilter) {
     addIfInvalid(

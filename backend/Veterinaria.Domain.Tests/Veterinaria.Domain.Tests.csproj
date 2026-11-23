@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Solo para AccountLockoutTests (RN-S5): reutiliza IdentityConfiguration e IdentityAuthenticationGateway reales. -->
     <ProjectReference Include="..\Veterinaria.Infrastructure\Veterinaria.Infrastructure.csproj" />
+    <ProjectReference Include="..\Veterinaria.Api\Veterinaria.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -111,6 +111,7 @@ repositorio/
 - Bloqueo de cuenta: el mensaje indica cuánto falta para desbloquear, en minutos y segundos.
 - Mascotas sin identificador propio: las mascotas no tienen un campo de identificación propio (se quitó del MVP). Se distinguen por su identificador interno de la base de datos y por su propietario.
 - Visibilidad del propietario: el administrador ve el nombre del propietario en el listado de mascotas y en la agenda. El propietario solo ve sus mascotas y sus citas, y no tiene filtro por identificación.
+- Búsqueda de citas: ambos roles pueden filtrar por nombre de mascota, con coincidencia parcial sin distinguir mayúsculas y minúsculas; el filtro se combina con los demás.
 - Errores de validación: usan `ProblemDetails`, con las claves del campo `errors` en camelCase.
 
 ## 5. Archivo `.env`
@@ -375,5 +376,6 @@ Notas:
 
 - Las fechas van en formato `yyyy-MM-dd` y las horas de inicio en `HH:mm`, de 08:00 a 17:00.
 - Los tipos de servicio son `Clinic` (clínica), `Aesthetics` (estética) y `Recreation` (recreación).
+- `GET /api/appointments` admite el parámetro opcional `petName` (hasta 100 caracteres); espacios exteriores se ignoran y `%`, `_` y `\` se buscan literalmente.
 - Un propietario que pide un recurso ajeno recibe 404 genérico. En el listado de citas, un filtro con datos ajenos devuelve una lista vacía.
 - Las respuestas nunca incluyen contraseñas ni hashes.

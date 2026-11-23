@@ -76,11 +76,12 @@ public sealed record AppointmentListItemResponse(
     string Status,
     string? OwnerName);
 
-// Limits of the appointment search filters (T-07 section 6). Column lengths: Appointments.ReferenceNumber, AspNetUsers.Identification.
+// Limits of the appointment search filters (T-07 section 6).
 public static class AppointmentSearchLimits
 {
     public const int MaxReferenceNumberLength = 20;
     public const int MaxOwnerIdentificationLength = 20;
+    public const int MaxPetNameLength = CreatePetRequest.MaxNameLength;
 
     public const string ReferenceNumberPattern = "^[A-Za-z0-9-]+\\z";
 }

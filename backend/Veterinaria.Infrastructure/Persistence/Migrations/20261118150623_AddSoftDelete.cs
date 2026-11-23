@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Veterinaria.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddSoftDelete : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTimeOffset>(
@@ -30,7 +30,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                 nullable: true);
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

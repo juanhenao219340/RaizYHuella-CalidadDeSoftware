@@ -1,8 +1,8 @@
-// Pure helper import from Services/ (format.js): no network calls in this component.
+
 import { formatSlotCount } from '../Services/format'
 
-// Time slots from GET /api/appointments/availability. Unavailable slots are disabled (plan D2-A).
-// Presentation only: the API decides availability and validates every reservation.
+
+
 function AvailabilityPicker({ slots = [], value = '', onChange, disabled = false, idPrefix = 'slot' }) {
   return (
     <div role="group" aria-label="Hora de inicio" className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">

@@ -29,7 +29,6 @@ public sealed class AppointmentConfiguration : IEntityTypeConfiguration<Appointm
         builder.Property(appointment => appointment.ChangeReason).HasMaxLength(500);
         builder.Property(appointment => appointment.CreatedAt).IsRequired();
 
-        // Version is the concurrency token for reschedule and cancel (R13-7).
         builder.Property(appointment => appointment.Version).IsConcurrencyToken();
 
         builder.HasIndex(appointment => appointment.ReferenceNumber)

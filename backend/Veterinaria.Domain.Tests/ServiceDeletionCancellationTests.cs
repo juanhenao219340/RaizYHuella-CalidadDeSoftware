@@ -7,13 +7,13 @@ using static Veterinaria.Domain.Tests.TestData;
 
 namespace Veterinaria.Domain.Tests;
 
-// R18-1: confirmed future appointments of a deleted service are cancelled with the fixed reason.
+
 public class ServiceDeletionCancellationTests
 {
-    // Same calendar day as TestData.NowUtc (2026-11-18, 12:00 in America/Bogota).
+
     private static readonly DateOnly Today = new(2026, 11, 18);
 
-    // Creation time 08:00 in America/Bogota (13:00 UTC), used to schedule a same-day appointment that starts later.
+
     private static readonly DateTimeOffset MorningUtc = new(2026, 11, 18, 13, 0, 0, TimeSpan.Zero);
 
     [Fact]
@@ -34,7 +34,7 @@ public class ServiceDeletionCancellationTests
     [Fact]
     public void ConfirmedSameDayStartingLaterToday_IsSelected()
     {
-        // Booked at 08:00 for 14:00 today; at 12:00 (Bogota) the start is still ahead.
+
         var appointment = ScheduleAt(Today, hour: 14, nowUtc: MorningUtc);
 
         Assert.True(AppointmentModificationRules.IsFutureConfirmed(appointment, NowUtc, Options()));
@@ -43,7 +43,7 @@ public class ServiceDeletionCancellationTests
     [Fact]
     public void ConfirmedSameDayAlreadyStarted_IsNotSelected()
     {
-        // Booked at 08:00 for 10:00 today; at 12:00 (Bogota) the start is in the past.
+
         var appointment = ScheduleAt(Today, hour: 10, nowUtc: MorningUtc);
 
         Assert.False(AppointmentModificationRules.IsFutureConfirmed(appointment, NowUtc, Options()));

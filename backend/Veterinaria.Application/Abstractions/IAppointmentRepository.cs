@@ -16,7 +16,7 @@ public interface IAppointmentRepository
 
     Task<IReadOnlyList<AppointmentSummary>> GetPetSummaryAsync(Guid petId, CancellationToken cancellationToken);
 
-    // Confirmed appointments per start time for a service and day. Deleted pets and services are counted (D-H).
+
     Task<IReadOnlyDictionary<TimeSlot, int>> CountConfirmedByDayAndServiceAsync(
         DateOnly date,
         Guid serviceId,

@@ -12,7 +12,7 @@ public class AppointmentCancellationTests
     [Fact]
     public void Cancel_ByAdministrator_FreesSlot()
     {
-        // Four confirmed in the slot: the target appointment plus three others. The slot is full.
+
         var others = ConfirmedInSlot(3);
         var appointment = Appointment.Schedule(
             Guid.NewGuid(),

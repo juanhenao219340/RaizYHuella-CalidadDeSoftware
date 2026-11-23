@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Veterinaria.Api.Contracts;
 
-// OwnerId is never accepted from the body: it always comes from the JWT subject (RF-PRO-09). Any such field is ignored.
-// Nullable value types so that a missing value yields a Spanish 400 instead of a default value.
+
+
 public sealed record CreateAppointmentRequest
 {
     [Required(ErrorMessage = "La mascota es obligatoria.")]
@@ -20,7 +20,7 @@ public sealed record CreateAppointmentRequest
     public string? StartTime { get; init; }
 }
 
-// The pet is not editable: the appointment keeps its pet (T-06 section 2).
+
 public sealed record UpdateAppointmentRequest
 {
     [Required(ErrorMessage = "El servicio es obligatorio.")]
@@ -33,16 +33,16 @@ public sealed record UpdateAppointmentRequest
     [RegularExpression("^(0[89]|1[0-7]):00$", ErrorMessage = "La hora de inicio debe estar entre 08:00 y 17:00, en punto.")]
     public string? StartTime { get; init; }
 
-    // AllowEmptyStrings: "" and blank reasons reach the domain (RN-04 -> 422). A missing value (null) stays a 400.
-    // The domain also trims and enforces the 500-character limit; excess after trimming returns 422.
+
+
     [Required(AllowEmptyStrings = true, ErrorMessage = "El motivo del cambio es obligatorio.")]
     public string? Reason { get; init; }
 }
 
 public sealed record CancelAppointmentRequest
 {
-    // AllowEmptyStrings: "" and blank reasons reach the domain (RN-04 -> 422). A missing value (null) stays a 400.
-    // The domain also trims and enforces the 500-character limit; excess after trimming returns 422.
+
+
     [Required(AllowEmptyStrings = true, ErrorMessage = "El motivo de la anulación es obligatorio.")]
     public string? Reason { get; init; }
 }
@@ -61,8 +61,8 @@ public sealed record AppointmentResponse(
 
 public sealed record SlotAvailabilityResponse(string StartTime, int RemainingSlots, bool Available);
 
-// Read model for GET /api/appointments (T-07). No owner identification, e-mail or OwnerId is exposed.
-// OwnerName (R19-1) is filled only for administrators; it is null for owners.
+
+
 public sealed record AppointmentListItemResponse(
     Guid Id,
     string ReferenceNumber,
@@ -76,7 +76,7 @@ public sealed record AppointmentListItemResponse(
     string Status,
     string? OwnerName);
 
-// Limits of the appointment search filters (T-07 section 6).
+
 public static class AppointmentSearchLimits
 {
     public const int MaxReferenceNumberLength = 20;

@@ -10,19 +10,19 @@ import { cancelAppointment, getAvailability, listAppointments, updateAppointment
 import { listServices } from '../Services/servicesService'
 import { validateAppointmentFilters } from '../Services/validation'
 
-// The owner identification filter exists only for the administrator (decision R17-1).
+
 function getEmptyFilters(isAdmin) {
   return isAdmin
     ? { referenceNumber: '', petName: '', ownerIdentification: '', serviceType: '' }
     : { referenceNumber: '', petName: '', serviceType: '' }
 }
 
-// Codes after which the appointment is stale: the list is reloaded (RF-PRO-11, RF-PRO-07).
+
 const STALE_APPOINTMENT_CODES = ['RF-PRO-11', 'RF-PRO-07']
-// Codes after which the slot list is stale (RN-03 full slot, P-01 time already passed, RN-01 past date): slots are reloaded and the chosen time is cleared.
+
 const STALE_SLOT_CODES = ['RN-03', 'RN-01', 'P-01']
 
-// Trims filters and drops blanks: blank filters count as absent (plan section 5).
+
 function cleanFilters(values) {
   return Object.fromEntries(
     Object.entries(values)
@@ -31,7 +31,7 @@ function cleanFilters(values) {
   )
 }
 
-// Shows a dialog error: RN-04 (reason rule) goes under the reason field, anything else in the banner.
+
 function showDialogError(err, fallbackMessage, setFormError, setReasonError) {
   if (err.code === 'RN-04') {
     setReasonError(err.message)
@@ -40,9 +40,9 @@ function showDialogError(err, fallbackMessage, setFormError, setReasonError) {
   setFormError(err.message || fallbackMessage)
 }
 
-// Appointments for both roles (RF-CON-01, RF-CON-05). The API decides what each user sees.
-// Actions (reschedule, cancel) are shown only to the administrator.
-// This page owns every request made by the dialogs: services, availability, cancel, reschedule.
+
+
+
 function AppointmentsPage() {
   const { role } = useSession()
   const isAdmin = role === 'Administrator'
@@ -53,12 +53,12 @@ function AppointmentsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [selected, setSelected] = useState(null)
-  const [dialogKind, setDialogKind] = useState(null) // 'reschedule' | 'cancel' | null
+  const [dialogKind, setDialogKind] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [dialogError, setDialogError] = useState('')
   const [dialogReasonError, setDialogReasonError] = useState('')
   const [services, setServices] = useState([])
-  const [scheduleQuery, setScheduleQuery] = useState(null) // { serviceId, date } chosen in the reschedule dialog
+  const [scheduleQuery, setScheduleQuery] = useState(null)
   const [slots, setSlots] = useState([])
   const [isSlotsLoading, setIsSlotsLoading] = useState(false)
   const [slotsError, setSlotsError] = useState('')
@@ -80,7 +80,7 @@ function AppointmentsPage() {
     loadAppointments(applied)
   }, [applied, loadAppointments])
 
-  // Availability for the reschedule dialog. Reloads when the chosen service/date changes or after a stale slot.
+
   useEffect(() => {
     if (dialogKind !== 'reschedule' || !scheduleQuery?.serviceId || !scheduleQuery?.date) {
       setSlots([])

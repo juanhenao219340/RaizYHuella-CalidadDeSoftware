@@ -5,13 +5,13 @@ import FormErrorBanner from './FormErrorBanner'
 import FormField from './FormField'
 import Modal from './Modal'
 import Spinner from './Spinner'
-// Pure helpers only (no network): date formatting and validation.
+
 import { formatDate, todayIsoDate } from '../Services/format'
 import { validateReason } from '../Services/validation'
 
-// Administrator reschedules a Confirmed appointment. Only slots with capacity are offered (R13-12).
-// Presentation only: the page loads services and availability, sends the request and owns the errors.
-// The page passes slotsVersion; a new version means the slot list was reloaded and the chosen time is cleared (RN-03).
+
+
+
 function RescheduleDialog({
   appointment,
   services = [],
@@ -34,7 +34,7 @@ function RescheduleDialog({
   const [seenSlotsVersion, setSeenSlotsVersion] = useState(slotsVersion)
   const today = todayIsoDate()
 
-  // Clear the chosen time when the page reloads the slots after a stale-slot error (adjusting state during render).
+
   if (seenSlotsVersion !== slotsVersion) {
     setSeenSlotsVersion(slotsVersion)
     setStartTime('')

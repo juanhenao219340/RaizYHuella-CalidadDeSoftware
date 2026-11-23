@@ -3,7 +3,7 @@ import { INVALID_CREDENTIALS_MESSAGE } from './errorMessages'
 
 const LOCKED_OUT_FALLBACK_MESSAGE = 'Cuenta bloqueada por intentos fallidos.'
 
-// Storage key confirmed by the user (plan P-E). Only this module reads or writes it.
+
 export const SESSION_STORAGE_KEY = 'veterinaria.session'
 
 const ADMIN_HOME = '/admin/propietarios'
@@ -43,13 +43,13 @@ function readStoredToken() {
 
 registerTokenProvider(readStoredToken)
 
-// Local clock check is only a convenience; the server decides validity (plan 3.2).
+
 function isExpired(expiresAt) {
   const timestamp = Date.parse(expiresAt)
   return Number.isNaN(timestamp) || timestamp <= Date.now()
 }
 
-// GET /api/auth/me. Returns the identity used for routing and display.
+
 export async function me({ skipUnauthorizedHandler = false } = {}) {
   const response = await request('/api/auth/me', { skipUnauthorizedHandler })
   return {
@@ -60,7 +60,7 @@ export async function me({ skipUnauthorizedHandler = false } = {}) {
   }
 }
 
-// Login with Basic credentials, store the token, then load the identity.
+
 export async function login(email, password) {
   let session
   try {
@@ -74,7 +74,7 @@ export async function login(email, password) {
     if (error instanceof ApiError && error.status === 401) {
       throw new ApiError({ status: 401, message: INVALID_CREDENTIALS_MESSAGE })
     }
-    // RN-05 lockout (R15-1): keep the server's detail, which gives the remaining minutes and seconds.
+
     if (error instanceof ApiError && error.status === 423 && error.code === 'RN-05') {
       throw new ApiError({ status: 423, message: error.message || LOCKED_OUT_FALLBACK_MESSAGE, code: 'RN-05' })
     }
@@ -91,7 +91,7 @@ export async function login(email, password) {
   }
 }
 
-// Restores a session on page load. Returns the user, or null when there is no valid session.
+
 export async function restoreSession() {
   const stored = readStoredSession()
   if (!stored) {

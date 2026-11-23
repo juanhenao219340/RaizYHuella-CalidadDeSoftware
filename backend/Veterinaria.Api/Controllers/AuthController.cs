@@ -9,8 +9,8 @@ using Veterinaria.Infrastructure.Identity;
 
 namespace Veterinaria.Api.Controllers;
 
-// [ApiController] is intentionally omitted: it validates the body before the action runs, and the order
-// must be Basic Auth -> body validation -> Identity (D4). Body validation is therefore explicit below.
+
+
 [Route("api/auth")]
 public sealed class AuthController(
     LoginHandler loginHandler,
@@ -18,8 +18,8 @@ public sealed class AuthController(
     JwtTokenService tokenService,
     GetCurrentUserHandler getCurrentUserHandler) : ControllerBase
 {
-    // Same body for every credential failure, so the response does not reveal whether an e-mail exists (RNF-SEG-06).
-    // A new instance per response: ProblemDetails is mutable and must not be shared.
+
+
     private static ProblemDetails InvalidCredentialsProblem() => new()
     {
         Status = StatusCodes.Status401Unauthorized,
@@ -27,7 +27,7 @@ public sealed class AuthController(
         Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
     };
 
-    // Same body as the JWT OnChallenge gate in Program.cs (session/token failures on /me).
+
     private static ProblemDetails SessionProblem() => new()
     {
         Status = StatusCodes.Status401Unauthorized,
@@ -35,7 +35,7 @@ public sealed class AuthController(
         Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
     };
 
-    // RN-05 lockout (R15-1, D-1, D-2, D-5): 423 with the remaining time, also sent as Retry-After.
+
     private static ProblemDetails LockedOutProblem(int retryAfterSeconds)
     {
         var problem = new ProblemDetails
@@ -50,7 +50,7 @@ public sealed class AuthController(
         return problem;
     }
 
-    // "Intente de nuevo en {N} minutos y {M} segundos." with singular/plural and zero parts omitted.
+
     private static string LockoutDetail(int seconds)
     {
         var minutes = seconds / 60;
@@ -98,7 +98,7 @@ public sealed class AuthController(
 
         var result = await loginHandler.HandleAsync(request.Email, request.Password, cancellationToken);
 
-        // A lockout without a known remaining time cannot be described; it falls back to the generic 401 (RNF-SEG-06).
+
         if (result.Outcome is LoginOutcome.LockedOut && result.RetryAfterSeconds is { } retryAfterSeconds)
         {
             Response.Headers["Retry-After"] = retryAfterSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -131,7 +131,7 @@ public sealed class AuthController(
             return Unauthorized(SessionProblem());
         }
 
-        // Null when the account no longer exists or is logically deleted (RF-REG-10): same 401 as an invalid identity.
+
         var current = await getCurrentUserHandler.HandleAsync(userId.Value, cancellationToken);
 
         if (current is null)
@@ -142,8 +142,8 @@ public sealed class AuthController(
         return Ok(new MeResponse(userId.Value, role, current.Email, current.Name));
     }
 
-    // Same shape as the InvalidModelStateResponseFactory in Program.cs (translated field errors, Spanish title),
-    // so manual validation never leaks framework text (RNF-IDI-01, CA-REG-09).
+
+
     private IActionResult ValidationFailed()
     {
         return ValidationProblem(ModelErrorTranslator.CreateValidationProblem(ModelState, HttpContext));

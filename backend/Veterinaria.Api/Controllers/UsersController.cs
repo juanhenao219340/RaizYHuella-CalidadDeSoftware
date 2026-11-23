@@ -19,7 +19,7 @@ public sealed class UsersController(
     UpdateUserHandler updateUserHandler,
     DeleteUserHandler deleteUserHandler) : ControllerBase
 {
-    // Same body as the JWT OnChallenge gate in Program.cs. A new instance per response: ProblemDetails is mutable.
+
     private static ProblemDetails SessionProblem() => new()
     {
         Status = StatusCodes.Status401Unauthorized,
@@ -27,7 +27,7 @@ public sealed class UsersController(
         Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
     };
 
-    // Only administrators can create owner accounts (RF-AUT-10, CA-AUT-07). The role is fixed by the server.
+
     [HttpPost]
     [Authorize(Policy = "Administrator")]
     [ProducesResponseType<OwnerAccountResponse>(StatusCodes.Status201Created)]
@@ -51,7 +51,7 @@ public sealed class UsersController(
             new OwnerAccountResponse(user.Id, user.Identification, user.Name, user.Email));
     }
 
-    // Owner accounts only (RF-REG-07). Administrators are never listed.
+
     [HttpGet]
     [Authorize(Policy = "Administrator")]
     [ProducesResponseType<IReadOnlyList<UserResponse>>(StatusCodes.Status200OK)]
@@ -64,7 +64,7 @@ public sealed class UsersController(
         return Ok(owners.Select(ToResponse).ToList());
     }
 
-    // Self-service profile (RF-REG-08): the role is read-only and never comes from the request.
+
     [HttpGet("me")]
     [Authorize]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
@@ -107,7 +107,7 @@ public sealed class UsersController(
         return updated is null ? NotFoundAccount() : Ok(ToResponse(updated));
     }
 
-    // Visibility rules (owner sees only self, D-4 -> 404; administrator on administrator -> 403) live in Application.
+
     [HttpGet("{id:guid}")]
     [Authorize]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
@@ -149,7 +149,7 @@ public sealed class UsersController(
         return updated is null ? NotFoundAccount() : Ok(ToResponse(updated));
     }
 
-    // Logical deletion (RF-REG-10). Returns 403 when an owner targets their own account (c3).
+
     [HttpDelete("{id:guid}")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

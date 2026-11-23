@@ -8,8 +8,8 @@ using Veterinaria.Infrastructure.Repositories.Search;
 
 namespace Veterinaria.Infrastructure.Repositories;
 
-// One query per search, no per-row queries (T-07 section 3). Filters are combined with AND (successive Where).
-// Sin SQL escrito a mano (RNF-ARQ-07).
+
+
 public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : IAppointmentSearchRepository
 {
     public async Task<IReadOnlyList<AppointmentListItem>> SearchAsync(AppointmentSearchCriteria criteria, CancellationToken cancellationToken)
@@ -20,11 +20,11 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
             .AsNoTracking()
             .Join(context.Pets, appointment => appointment.PetId, pet => pet.Id, (appointment, pet) => new { Appointment = appointment, Pet = pet })
             .Join(context.Services, row => row.Appointment.ServiceId, service => service.Id, (row, service) => new { row.Appointment, row.Pet, Service = service })
-            // LEFT JOIN to the owner (R19-1): owner name in the same statement, no per-row query. Deleted owners are kept.
+
             .GroupJoin(context.Users, row => row.Pet.OwnerId, user => user.Id, (row, owners) => new { row.Appointment, row.Pet, row.Service, Owners = owners })
             .SelectMany(row => row.Owners.DefaultIfEmpty(), (row, owner) => new { row.Appointment, row.Pet, row.Service, OwnerName = owner == null ? null : owner.Name });
 
-        // Scope first (RF-CON-05). Deleted pets, services and owners are not filtered out (RF-REG-10 f, g).
+
         if (criteria.OwnerId is { } ownerId)
         {
             appointments = appointments.Where(row => row.Pet.OwnerId == ownerId);
@@ -48,7 +48,7 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
             appointments = appointments.Where(row => row.Service.Type == serviceType);
         }
 
-        // Partial, case-insensitive match on the stored text (R13-9, RF-CON-02). Wildcards escaped by LikePattern (RNF-ARQ-07: no manual SQL).
+
         if (criteria.ReferenceNumber is { } referenceNumber)
         {
             var pattern = LikePattern.Contains(referenceNumber);
@@ -89,7 +89,7 @@ public sealed class AppointmentSearchRepository(VeterinaryDbContext context) : I
             .ToList();
     }
 
-    // Flat projection of entity values only. Converted to text in memory, after the single statement.
+
     private sealed record AppointmentListRow(
         Guid Id,
         string ReferenceNumber,

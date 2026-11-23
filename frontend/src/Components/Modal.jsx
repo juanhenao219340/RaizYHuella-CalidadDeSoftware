@@ -3,7 +3,7 @@ import { useEffect, useId, useRef } from 'react'
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
 
-// Accessible dialog: focus moves inside, Tab stays trapped, Escape closes, focus returns to the opener.
+
 function Modal({ title, onClose, children }) {
   const titleId = useId()
   const dialogRef = useRef(null)

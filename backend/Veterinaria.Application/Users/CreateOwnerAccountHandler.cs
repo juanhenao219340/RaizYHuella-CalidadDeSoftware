@@ -21,7 +21,7 @@ public sealed class CreateOwnerAccountHandler(IUserRepository userRepository)
             throw new DomainRuleException("RF-REG-06", "El correo ya está registrado.");
         }
 
-        // The role is fixed by the server: only Owner accounts can be created here (RF-AUT-10).
+
         var user = new User(
             Guid.NewGuid(),
             command.Identification,
@@ -30,7 +30,7 @@ public sealed class CreateOwnerAccountHandler(IUserRepository userRepository)
             command.Phone,
             UserRole.Owner);
 
-        // Password policy (RF-AUT-06) is enforced by Identity during CreateAsync.
+
         await userRepository.CreateAsync(user, command.Password, cancellationToken);
 
         return user;

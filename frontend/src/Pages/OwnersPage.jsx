@@ -10,13 +10,13 @@ import Spinner from '../Components/Spinner'
 import Table from '../Components/Table'
 import { createOwner, deleteUser, getUser, listOwners, updateUser } from '../Services/usersService'
 
-// Owner list and CRUD (plan 6.2 A1). The API returns only accounts with the Owner role.
+
 function OwnersPage() {
   const [owners, setOwners] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [query, setQuery] = useState('')
-  const [dialogMode, setDialogMode] = useState(null) // 'create' | 'edit' | null
+  const [dialogMode, setDialogMode] = useState(null)
   const [selectedOwner, setSelectedOwner] = useState(null)
   const [isLoadingDetail, setIsLoadingDetail] = useState(false)
   const [detailError, setDetailError] = useState('')
@@ -56,7 +56,7 @@ function OwnersPage() {
     setDialogMode('create')
   }
 
-  // Edit loads the current account with GET /api/users/{id} before showing the form.
+
   async function openEdit(owner) {
     setDialogMode('edit')
     setSelectedOwner(owner)

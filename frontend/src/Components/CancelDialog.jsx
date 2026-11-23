@@ -5,8 +5,8 @@ import FormField from './FormField'
 import Modal from './Modal'
 import { validateReason } from '../Services/validation'
 
-// Administrator cancels a Confirmed appointment. A reason is required (CA-PRO-05).
-// Presentation only: the page owns the request, isSubmitting, server errors and the list reload.
+
+
 function CancelDialog({ appointment, isSubmitting = false, formError = '', reasonError = '', onConfirm, onClose }) {
   const [reason, setReason] = useState('')
   const [localError, setLocalError] = useState('')

@@ -9,7 +9,7 @@ public class Appointment
 {
     public Guid Id { get; private set; }
 
-    // Stored as text (R13-9). The format is validated by ReferenceNumber when the appointment is scheduled.
+
     public string ReferenceNumber { get; private set; } = string.Empty;
 
     public Guid PetId { get; private set; }
@@ -28,10 +28,10 @@ public class Appointment
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    // Concurrency token (R13-7): changes on every modification of the appointment.
+
     public int Version { get; private set; }
 
-    // Parameterless constructor reserved for EF Core (materialization); does not validate and is not for application use.
+
     private Appointment()
     {
     }

@@ -4,8 +4,8 @@ namespace Veterinaria.Infrastructure.Configuration;
 
 public sealed class SeedOptions
 {
-    // SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_ADMIN_IDENTIFICATION and SEED_ADMIN_NAME are mandatory and have
-    // no default value in code (R13-6): if any is missing or empty, the API does not start.
+
+
     public string Email { get; private set; } = string.Empty;
 
     public string Password { get; private set; } = string.Empty;

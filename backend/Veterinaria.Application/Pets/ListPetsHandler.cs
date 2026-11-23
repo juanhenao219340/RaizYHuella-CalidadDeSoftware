@@ -7,7 +7,7 @@ public sealed record ListPetsQuery(Guid CallerId, UserRole CallerRole);
 
 public sealed class ListPetsHandler(IPetRepository petRepository)
 {
-    // Administrators also get the owner name and deletion state (R14-1); owners get no owner data (null).
+
     public async Task<IReadOnlyList<PetWithOwner>> HandleAsync(ListPetsQuery query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);

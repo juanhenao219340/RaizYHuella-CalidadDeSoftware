@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace Veterinaria.Api.Middleware;
 
-// Answers policy failures (role mismatch) with a Spanish 403 body (RNF-IDI-01, D-12, OD-3).
+
 public sealed class ForbiddenResultHandler : IAuthorizationMiddlewareResultHandler
 {
     private readonly AuthorizationMiddlewareResultHandler fallback = new();

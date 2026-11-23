@@ -13,7 +13,7 @@ public sealed record LoginRequest
     public string Password { get; init; } = string.Empty;
 }
 
-// The JWT travels only in this body; there is no Set-Cookie (RF-AUT-03, RNF-SEG-02).
+
 public sealed record LoginResponse(string Token, DateTimeOffset ExpiresAt, string Role);
 
 public sealed record MeResponse(Guid UserId, string Role, string Email, string Name);

@@ -39,7 +39,7 @@ public sealed class ServicesController(
         return service is null ? NotFoundService() : Ok(ToResponse(service));
     }
 
-    // Catalogue writes are administrator-only (policy). Owners receive 403 (CA-REG-05).
+
     [HttpPost]
     [Authorize(Policy = "Administrator")]
     [ProducesResponseType<ServiceResponse>(StatusCodes.Status201Created)]
@@ -80,7 +80,7 @@ public sealed class ServicesController(
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        // Only administrators reach this action (policy), so the actor role is Administrator by construction.
+
         var deleted = await deleteServiceHandler.HandleAsync(new DeleteServiceCommand(id, UserRole.Administrator), cancellationToken);
 
         return deleted ? NoContent() : NotFoundService();

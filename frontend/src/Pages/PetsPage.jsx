@@ -9,12 +9,12 @@ import Table from '../Components/Table'
 import { createPet, deletePet, listPets, updatePet } from '../Services/petsService'
 import { formatDate } from '../Services/format'
 
-// Owner's pets (RF-REG-02). The API returns only the pets of the signed-in owner.
+
 function PetsPage() {
   const [pets, setPets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [dialogMode, setDialogMode] = useState(null) // 'create' | 'edit' | null
+  const [dialogMode, setDialogMode] = useState(null)
   const [selectedPet, setSelectedPet] = useState(null)
   const [petToDelete, setPetToDelete] = useState(null)
   const [deleteError, setDeleteError] = useState('')

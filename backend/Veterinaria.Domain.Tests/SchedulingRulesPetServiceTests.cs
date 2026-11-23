@@ -48,7 +48,7 @@ public class SchedulingRulesPetServiceTests
     [Fact]
     public void Validate_OtherPetSameTuple_IsNotP02()
     {
-        // P-02 is per pet. Another pet in the same tuple only consumes capacity, and one slot is still free.
+
         var appointments = new List<AppointmentSummary> { Summary(petId: Guid.NewGuid(), hour: 10, serviceId: ServiceA) };
 
         var result = SchedulingRules.Validate(Request(petId: Guid.NewGuid(), hour: 10, serviceId: ServiceA), NowUtc, Options(), appointments, null);
@@ -75,7 +75,7 @@ public class SchedulingRulesPetServiceTests
             Options(),
             new[] { Summarize(first) });
 
-        // Moving the first appointment to 11:00 with the same service collides with the second appointment of the same pet.
+
         var summaries = new[] { Summarize(first), Summarize(second) };
         var result = AppointmentModificationRules.ValidateUpdate(
             UserRole.Administrator,
@@ -100,7 +100,7 @@ public class SchedulingRulesPetServiceTests
             Options(),
             Array.Empty<AppointmentSummary>());
 
-        // Same tuple as the appointment itself: it must not conflict with its own record.
+
         var result = AppointmentModificationRules.ValidateUpdate(
             UserRole.Administrator,
             appointment,

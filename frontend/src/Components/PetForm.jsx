@@ -2,13 +2,13 @@ import { useState } from 'react'
 import Button from './Button'
 import FormErrorBanner from './FormErrorBanner'
 import FormField from './FormField'
-// Pure helpers only (no network): see the Components/ import rule in the frontend docs.
+
 import { getConflictField, splitFieldErrors } from '../Services/errorMessages'
 import { validatePetCreate, validatePetUpdate } from '../Services/validation'
 
 const FORM_FIELDS = ['name', 'species', 'breed', 'birthDate']
 
-// Pet create/edit form. The parent passes onSubmit; this form does not know the endpoint.
+
 function PetForm({ mode = 'create', initialValues = {}, onSubmit, onCancel }) {
   const isCreate = mode === 'create'
   const [values, setValues] = useState({

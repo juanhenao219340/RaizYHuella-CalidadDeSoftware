@@ -4,10 +4,10 @@
 
 namespace Veterinaria.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class RenameGroomingToAesthetics : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropCheckConstraint(
@@ -22,7 +22,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                 sql: "\"Type\" IN ('Clinic', 'Aesthetics', 'Recreation')");
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropCheckConstraint(

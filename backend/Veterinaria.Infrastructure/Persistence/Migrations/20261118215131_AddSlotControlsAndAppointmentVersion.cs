@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Veterinaria.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddSlotControlsAndAppointmentVersion : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -44,7 +44,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                 column: "ServiceId");
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

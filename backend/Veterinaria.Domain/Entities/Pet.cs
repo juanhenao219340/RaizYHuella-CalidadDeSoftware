@@ -71,7 +71,7 @@ public class Pet
         BirthDate = candidate.BirthDate;
     }
 
-    // Logical deletion (RF-REG-10). The pet has no identifier to release.
+
     public void Delete(DateTimeOffset deletedAt)
     {
         if (IsDeleted)

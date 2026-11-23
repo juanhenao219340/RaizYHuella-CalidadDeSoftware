@@ -30,10 +30,10 @@ public sealed record CreateOwnerRequest
     public string Password { get; init; } = string.Empty;
 }
 
-// Never includes the password hash or the password itself.
+
 public sealed record OwnerAccountResponse(Guid Id, string Identification, string Name, string Email);
 
-// Identification and role are not editable here: any such field sent by the client is ignored (D-5, R-2).
+
 public sealed record UpdateUserRequest
 {
     public const int MaxNameLength = 150;

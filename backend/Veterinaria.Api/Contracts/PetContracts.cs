@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Veterinaria.Api.Contracts;
 
-// OwnerId is never accepted from the body: it always comes from the JWT subject (RF-PRO-09, D-1).
+
 public sealed record CreatePetRequest
 {
     public const int MaxNameLength = 100;
@@ -21,12 +21,12 @@ public sealed record CreatePetRequest
     [StringLength(MaxBreedLength, ErrorMessage = "La raza no puede superar 100 caracteres.")]
     public string Breed { get; init; } = string.Empty;
 
-    // Nullable so that a missing value yields a Spanish 400 instead of the default date (D-8).
+
     [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
     public DateOnly? BirthDate { get; init; }
 }
 
-// Owner is not editable (D-6, RF-PRO-09). Any such field sent by the client is ignored.
+
 public sealed record UpdatePetRequest
 {
     [Required(ErrorMessage = "El nombre de la mascota es obligatorio.")]
@@ -45,8 +45,8 @@ public sealed record UpdatePetRequest
     public DateOnly? BirthDate { get; init; }
 }
 
-// OwnerName and OwnerDeleted are filled only for administrators (RF-REG-07 a, R14-1); owners receive null for both.
-// Nullable bool so that the owner response keeps the same keys with null values (D-2).
+
+
 public sealed record PetResponse(
     Guid Id,
     string Name,

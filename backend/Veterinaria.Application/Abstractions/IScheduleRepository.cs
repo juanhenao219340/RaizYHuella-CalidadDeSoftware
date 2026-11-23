@@ -30,7 +30,7 @@ public interface IScheduleRepository
         DateTimeOffset nowUtc,
         CancellationToken cancellationToken);
 
-    // Cancels the confirmed future appointments of the service (R18-1) and deletes it, in one transaction. False when the service does not exist or is already deleted.
+
     Task<bool> DeleteServiceAsync(
         Guid serviceId,
         UserRole actorRole,

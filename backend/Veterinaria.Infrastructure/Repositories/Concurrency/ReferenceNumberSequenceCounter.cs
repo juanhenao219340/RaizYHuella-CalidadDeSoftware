@@ -4,9 +4,9 @@ using Veterinaria.Infrastructure.Persistence;
 
 namespace Veterinaria.Infrastructure.Repositories.Concurrency;
 
-// EXCEPCIÓN R13-3 (RNF-ARQ-07): única SQL escrita a mano permitida en backend/.
-// Consecutivo diario atómico sobre "ReferenceNumberSequences" (INSERT ... ON CONFLICT ... DO UPDATE ... RETURNING),
-// parametrizado y ejecutado dentro de la transacción actual de EF Core. Si la transacción hace rollback, el consecutivo también.
+
+
+
 public sealed class ReferenceNumberSequenceCounter(VeterinaryDbContext context)
 {
     public async Task<int> NextAsync(DateOnly date, CancellationToken cancellationToken)

@@ -1,14 +1,14 @@
 import Button from './Button'
 import Table from './Table'
-// Pure helper import from Services/ (format.js): no network calls in this component.
+
 import { formatAppointmentStatus, formatDateTime } from '../Services/format'
 
-// Appointment list. Actions appear only for the administrator and only on Confirmed appointments (CA-PRO-11).
+
 function AppointmentsTable({ appointments, isLoading = false, isAdmin = false, onReschedule, onCancel }) {
   const columns = [
     { key: 'referenceNumber', label: 'Radicado', render: (item) => item.referenceNumber },
     { key: 'petName', label: 'Mascota', render: (item) => item.petName },
-    // Owner column only for the administrator (R19-1). Owners see the table without it.
+
     ...(isAdmin
       ? [{ key: 'ownerName', label: 'Propietario', render: (item) => item.ownerName ?? '—' }]
       : []),

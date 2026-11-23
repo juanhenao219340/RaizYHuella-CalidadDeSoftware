@@ -5,7 +5,7 @@ import {
   NETWORK_ERROR_MESSAGE,
 } from './errorMessages'
 
-// Error raised for every failed API call. `message` is the Spanish text for the UI.
+
 export class ApiError extends Error {
   constructor({ status, message, code = null, fieldErrors = {} }) {
     super(message)
@@ -16,7 +16,7 @@ export class ApiError extends Error {
   }
 }
 
-// Token and 401 hooks are registered by the session layer, which avoids import cycles.
+
 let tokenProvider = () => null
 let unauthorizedHandler = null
 
@@ -28,7 +28,7 @@ export function registerUnauthorizedHandler(handler) {
   unauthorizedHandler = handler
 }
 
-// Basic credentials: UTF-8 first, then base64 (btoa alone fails on non-ASCII text).
+
 export function encodeBasicCredentials(username, password) {
   const bytes = new TextEncoder().encode(`${username}:${password}`)
   let binary = ''
@@ -60,12 +60,12 @@ async function readBody(response) {
   try {
     return await response.json()
   } catch {
-    // Non-JSON bodies (proxy pages, empty 401) fall back to the status-based message.
+
     return null
   }
 }
 
-// Single HTTP entry point. Components never build headers or URLs.
+
 export async function request(
   path,
   { method = 'GET', body, auth = 'bearer', signal, skipUnauthorizedHandler = false } = {},

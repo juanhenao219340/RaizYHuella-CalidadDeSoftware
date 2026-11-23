@@ -1,5 +1,5 @@
-// Responsive list: a table from md up, stacked cards below md. Both use the same columns.
-// A column with `srOnly: true` is hidden from the table header but still reachable by assistive tech.
+
+
 function Table({ caption, columns, rows, getRowKey, isLoading = false }) {
   if (isLoading) {
     return (

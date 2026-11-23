@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Veterinaria.Api.Contracts;
 
-// Rejects values that start with the prefix reserved for logically deleted records (OD-2, case-sensitive: S-26, D-9).
+
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class NotReservedPrefixAttribute : ValidationAttribute
 {

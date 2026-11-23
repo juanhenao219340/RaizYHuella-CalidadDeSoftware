@@ -24,7 +24,7 @@ public sealed class UserRepository(VeterinaryDbContext context, UserManager<Appl
         return applicationUser is null ? null : await ToDomainAsync(applicationUser);
     }
 
-    // Owners that are not logically deleted. Deleted accounts keep their transformed values and are not listed (RF-REG-10).
+
     public async Task<IReadOnlyList<User>> ListOwnersAsync(CancellationToken cancellationToken)
     {
         var owners = await userManager.GetUsersInRoleAsync(RoleNames.Owner);
@@ -53,7 +53,7 @@ public sealed class UserRepository(VeterinaryDbContext context, UserManager<Appl
 
         UserMapper.CopyDomainData(user, applicationUser);
 
-        // Account creation and role assignment commit together (H-D): if the role fails, the account is not kept.
+
         await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         var created = await ExecuteAsync(() => userManager.CreateAsync(applicationUser, password));

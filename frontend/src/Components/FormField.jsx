@@ -1,7 +1,7 @@
 const CONTROL_BASE =
   'min-h-11 w-full rounded-md border bg-surface px-3 py-2 text-text disabled:opacity-60'
 
-// Label, control and field message. The control receives id and ARIA attributes here.
+
 function FormField({ id, label, error = '', hint = '', as = 'input', children = null, ...controlProps }) {
   const Control = as
   const hintId = `${id}-hint`

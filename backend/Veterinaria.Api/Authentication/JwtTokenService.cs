@@ -19,7 +19,7 @@ public sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider t
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Value.Key));
         var expiresAt = now.AddMinutes(AuthenticationConstants.TokenLifetimeMinutes);
 
-        // Only sub (user id) and role are included: no e-mail or name (assumption S-2).
+
         Claim[] claims =
         [
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),

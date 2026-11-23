@@ -6,7 +6,7 @@ public sealed class LoginHandler(IAuthenticationGateway authenticationGateway, T
 {
     public async Task<LoginResult> HandleAsync(string email, string password, CancellationToken cancellationToken)
     {
-        // Null is excluded by the controller's body validation. Whitespace-only values are wrong credentials, not errors.
+
         ArgumentNullException.ThrowIfNull(email);
         ArgumentNullException.ThrowIfNull(password);
 
@@ -17,7 +17,7 @@ public sealed class LoginHandler(IAuthenticationGateway authenticationGateway, T
             return result;
         }
 
-        // Seconds left in the lockout, rounded up, never less than 1 while the lock is active (RF-AUT-03, RN-05).
+
         var remaining = lockoutEnd - timeProvider.GetUtcNow();
         var retryAfterSeconds = (int)Math.Max(1, Math.Ceiling(remaining.TotalSeconds));
 

@@ -7,7 +7,7 @@ namespace Veterinaria.Application.Appointments;
 
 public sealed record CreateAppointmentCommand(Guid OwnerId, Guid PetId, Guid ServiceId, DateOnly Date, string StartTime);
 
-// Null means "not found for this caller" (404). Pre-checks give specific messages; the authoritative check is inside the transaction.
+
 public sealed class CreateAppointmentHandler(
     IPetRepository petRepository,
     IServiceRepository serviceRepository,

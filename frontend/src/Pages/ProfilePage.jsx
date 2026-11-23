@@ -10,7 +10,7 @@ import { validateProfile } from '../Services/validation'
 
 const FORM_FIELDS = ['name', 'email', 'phone']
 
-// Owner profile (RF-REG-08). Identification and role are read-only; no account deletion or password change.
+
 function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [values, setValues] = useState({ name: '', email: '', phone: '' })

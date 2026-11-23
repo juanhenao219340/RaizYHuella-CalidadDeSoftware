@@ -8,7 +8,7 @@ public interface IServiceRepository
 
     Task<Service?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    // Includes soft-deleted services; used by appointment creation to answer RF-REG-10 instead of 404 (T-06).
+
     Task<Service?> GetByIdIncludingDeletedAsync(Guid id, CancellationToken cancellationToken);
 
     Task CreateAsync(Service service, CancellationToken cancellationToken);

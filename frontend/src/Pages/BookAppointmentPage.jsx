@@ -13,10 +13,10 @@ import { formatServiceType, todayIsoDate } from '../Services/format'
 import { validateBooking } from '../Services/validation'
 import { LIST_LOAD_ERROR_MESSAGE } from '../Services/errorMessages'
 
-// Codes after which the slot list is stale and must be reloaded (RN-03 full slot, P-01 time already passed, RN-01 past date).
+
 const RELOAD_SLOTS_CODES = ['RN-03', 'P-01', 'RN-01']
 
-// Owner books an appointment in five steps on one screen (RF-PRO-01, RF-PRO-04).
+
 function BookAppointmentPage() {
   const [pets, setPets] = useState([])
   const [services, setServices] = useState([])
@@ -54,7 +54,7 @@ function BookAppointmentPage() {
     loadCatalog()
   }, [loadCatalog])
 
-  // Availability loads when service and date are both chosen; aborted when they change.
+
   useEffect(() => {
     if (!serviceId || !date) {
       setSlots([])

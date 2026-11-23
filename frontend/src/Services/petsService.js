@@ -1,6 +1,6 @@
 import { request } from './apiClient'
 
-// Pet endpoints. Each function sends only the fields the API accepts; `ownerId` is never sent (RF-PRO-09).
+
 export function listPets() {
   return request('/api/pets')
 }

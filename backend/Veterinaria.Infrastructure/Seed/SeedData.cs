@@ -55,7 +55,7 @@ public static class SeedData
         }
         catch (DbUpdateException)
         {
-            // Another start-up created the same fixed-Id rows concurrently; the rows exist, nothing else to do.
+
         }
     }
 
@@ -70,7 +70,7 @@ public static class SeedData
 
         if (existing is not null)
         {
-            // Idempotent: an existing administrator is never modified (no password or data changes).
+
             var roles = await userManager.GetRolesAsync(existing);
 
             if (!roles.Contains(RoleNames.Administrator))
@@ -93,7 +93,7 @@ public static class SeedData
             Name = seed.Name
         };
 
-        // Creation and role assignment commit together: if the role fails, the account is not kept (same pattern as UserRepository.CreateAsync).
+
         await using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
 
         var created = await userManager.CreateAsync(administrator, seed.Password);

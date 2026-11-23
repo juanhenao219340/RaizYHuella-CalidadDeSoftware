@@ -92,7 +92,7 @@ public class AppointmentModificationRulesTests
     [Fact]
     public void Cancel_ReasonTrimmedBeforeLimit_IsAccepted()
     {
-        // 498 letters plus 2 surrounding spaces: 502 characters raw, 498 after trimming. The limit applies after trimming.
+
         var appointment = ScheduledAppointment();
         var letters = new string('a', 498);
 

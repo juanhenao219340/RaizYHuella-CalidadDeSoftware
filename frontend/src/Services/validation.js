@@ -1,5 +1,5 @@
-// Client-side rules that mirror the backend (plan section 5). UX only: the API is authoritative.
-// Pure functions: no IO, no React state, no JSX. Each returns a map of field → Spanish message.
+
+
 
 export const MAX_EMAIL_LENGTH = 256
 export const MAX_PASSWORD_MESSAGE =
@@ -40,7 +40,7 @@ export function validateLogin({ email, password }) {
   return compact(errors)
 }
 
-// Keep only the fields that have a message, so `Object.keys(errors).length` means "has errors".
+
 export function compact(errors) {
   return Object.fromEntries(Object.entries(errors).filter(([, message]) => Boolean(message)))
 }
@@ -59,7 +59,7 @@ export function validatePassword(value) {
   return ''
 }
 
-// Owner account (alta) and owner profile share name, email and phone rules.
+
 function validateContactFields(values, errors) {
   const name = cleanText(values.name)
   errors.name = !name
@@ -128,7 +128,7 @@ function validatePetFields(values, errors) {
       ? 'La raza no puede superar 100 caracteres.'
       : ''
 
-  // Presence and format only; no future-date rule (decision D10-A).
+
   const birthDate = cleanText(values.birthDate)
   errors.birthDate = !birthDate || !isValidIsoDate(birthDate)
     ? 'La fecha de nacimiento es obligatoria.'
@@ -163,7 +163,7 @@ export function validateBooking({ petId, serviceId, date, startTime }) {
   return compact(errors)
 }
 
-// Reason for cancelling or rescheduling. Required after trimming, at most 500 characters.
+
 export function validateReason(value, kind = 'cancel') {
   const reason = cleanText(value)
   if (!reason) {
@@ -177,7 +177,7 @@ export function validateReason(value, kind = 'cancel') {
   return ''
 }
 
-// ownerIdentification is validated only when its filter is visible (administrator, decision R17-1).
+
 export function validateAppointmentFilters({ referenceNumber, petName, ownerIdentification }, { showOwnerFilter = false } = {}) {
   const errors = {}
   const reference = cleanText(referenceNumber)

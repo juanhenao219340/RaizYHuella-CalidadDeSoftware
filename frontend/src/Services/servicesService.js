@@ -1,6 +1,6 @@
 import { request } from './apiClient'
 
-// Service catalog. Administrator creates, edits and deletes; every authenticated user lists.
+
 export function listServices() {
   return request('/api/services')
 }

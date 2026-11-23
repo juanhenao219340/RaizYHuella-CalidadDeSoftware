@@ -34,8 +34,8 @@ public static class PersistenceErrors
         }
     }
 
-    // RF-PRO-07 only when the appointment is cancelled in the database. Any other conflict is a version conflict (RF-PRO-11, 409).
-    // A missing row cannot occur today (appointments are never hard-deleted), so it is reported as a version conflict too.
+
+
     private static async Task<DomainRuleException> TranslateAppointmentConflictAsync(
         VeterinaryDbContext context,
         DbUpdateConcurrencyException exception,

@@ -2,13 +2,13 @@ import { useState } from 'react'
 import Button from './Button'
 import FormErrorBanner from './FormErrorBanner'
 import FormField from './FormField'
-// Pure helpers only (no network): see the Components/ import rule in the frontend docs.
+
 import { getConflictField, splitFieldErrors } from '../Services/errorMessages'
 import { validateOwnerCreate, validateOwnerUpdate } from '../Services/validation'
 
 const FORM_FIELDS = ['identification', 'name', 'email', 'phone', 'password']
 
-// Owner create/edit form. In edit mode identification is read-only and there is no password field (plan 6.2 A1).
+
 function OwnerForm({ mode = 'create', initialValues = {}, onSubmit, onCancel }) {
   const isCreate = mode === 'create'
   const [values, setValues] = useState({

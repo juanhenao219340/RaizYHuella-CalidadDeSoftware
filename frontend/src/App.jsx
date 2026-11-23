@@ -18,11 +18,11 @@ const ADMIN = ['Administrator']
 const OWNER = ['Owner']
 const BOTH_ROLES = ['Administrator', 'Owner']
 
-// Route map (plan 6.1). Guards and the layout receive session data as props from here.
+
 function App() {
   const { user, role, isRestoring, logout } = useSession()
 
-  // Wraps a page with the role guard. The guard does not read the context.
+
   function guard(allowedRoles, page) {
     return (
       <RequireRole user={user} role={role} allowedRoles={allowedRoles}>

@@ -7,12 +7,12 @@ using DomainLockoutOptions = Veterinaria.Domain.Configuration.LockoutOptions;
 
 namespace Veterinaria.Domain.Tests;
 
-// RN-S5: after 3 failed password attempts the account is locked for 2 minutes; a 4th attempt, even with the
-// correct password, is rejected while the lock lasts.
-//
-// Identity reads DateTimeOffset.UtcNow internally when it stamps the lockout end, so the clock cannot be injected.
-// The test therefore does not wait 2 minutes: it asserts the lockout end date Identity stores, and that the 4th
-// attempt is rejected because that date is still in the future.
+
+
+
+
+
+
 public class AccountLockoutTests
 {
     private const string Email = "owner@lockout.test";
@@ -41,7 +41,7 @@ public class AccountLockoutTests
     [Fact]
     public async Task FourthAttempt_IsRejected_WhileLockoutLasts_AfterThreeFailedAttempts()
     {
-        // Same values as the RN-S5 configuration, mapped by the real IdentityConfiguration.Apply.
+
         var lockout = new DomainLockoutOptions { MaxFailedAttempts = 3, LockoutMinutes = 2 };
 
         var services = new ServiceCollection();
@@ -65,7 +65,7 @@ public class AccountLockoutTests
         for (var attempt = 1; attempt <= 3; attempt++)
         {
             var failed = await gateway.CheckCredentialsAsync(Email, WrongPassword, CancellationToken.None);
-            // The third failure reaches MaxFailedAccessAttempts, so Identity locks the account on that same attempt.
+
             var expected = attempt < 3 ? LoginOutcome.InvalidCredentials : LoginOutcome.LockedOut;
             Assert.Equal(expected, failed.Outcome);
         }
@@ -82,7 +82,7 @@ public class AccountLockoutTests
         Assert.Equal(LoginOutcome.LockedOut, rejected.Outcome);
     }
 
-    // RN-05 / D-4 (R15-1): attempts made during the lockout, correct or not, do not extend it and do not count.
+
     [Fact]
     public async Task AttemptsDuringLockout_DoNotExtendLockoutEnd_NorIncrementFailedCount()
     {
@@ -123,8 +123,8 @@ public class AccountLockoutTests
         Assert.Equal(lockoutEndBefore, correctDuring.LockoutEnd);
     }}
 
-// Minimal in-memory Identity store used only by this test. It keeps the users in a list and implements the
-// interfaces that UserManager, SignInManager and the lockout logic need. Passwords are hashed by Identity itself.
+
+
 internal sealed class InMemoryUserStore :
     IUserStore<ApplicationUser>,
     IUserPasswordStore<ApplicationUser>,

@@ -9,12 +9,12 @@ import Table from '../Components/Table'
 import { createService, deleteService, listServices, updateService } from '../Services/servicesService'
 import { formatServiceType } from '../Services/format'
 
-// Service catalog CRUD (RF-REG-09, CA-REG-05). Deleted services disappear; their future appointments stay.
+
 function ServicesPage() {
   const [services, setServices] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [dialogMode, setDialogMode] = useState(null) // 'create' | 'edit' | null
+  const [dialogMode, setDialogMode] = useState(null)
   const [selectedService, setSelectedService] = useState(null)
   const [serviceToDelete, setServiceToDelete] = useState(null)
   const [deleteError, setDeleteError] = useState('')

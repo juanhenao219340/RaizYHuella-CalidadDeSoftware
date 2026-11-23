@@ -13,14 +13,14 @@ using Veterinaria.Infrastructure.Repositories.Concurrency;
 
 namespace Veterinaria.Infrastructure.Repositories;
 
-// Sin SQL escrito a mano (RNF-ARQ-07). Excepción única R13-3: el consecutivo vive en ReferenceNumberSequenceCounter.
-// Turno por franja (R13-4): reservar, reprogramar y anular toman la fila SlotControls con ExecuteUpdateAsync dentro de la transacción.
+
+
 public sealed class ScheduleRepository(
     VeterinaryDbContext context,
     IAppointmentRepository appointments,
     ReferenceNumberSequenceCounter sequenceCounter) : IScheduleRepository
 {
-    // Rounds in which appointments that entered after the snapshot are added to a service deletion (D5).
+
     private const int MaxDiscoveryRetries = 3;
 
     public async Task<Appointment> BookAsync(
@@ -30,7 +30,7 @@ public sealed class ScheduleRepository(
         BusinessRulesOptions options,
         CancellationToken cancellationToken)
     {
-        // Authoritative checks on deleted records (LINQ, no row locks). Run before the slot row is created so a missing service never reaches the FK.
+
         if (await PetDeletedFlagAsync(request.PetId, cancellationToken) is not false)
         {
             throw new DomainRuleException("RF-REG-10", "La mascota está eliminada y no puede usarse para nuevas citas.");
@@ -51,14 +51,14 @@ public sealed class ScheduleRepository(
 
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
-        // Locks the service row first, same order as DeleteServiceAsync (service, then slots), so the two never deadlock.
-        // Under the lock, a service deleted after the pre-check above is rejected with RF-REG-10 (R18-1, decision 1 A).
+
+
         if (!await LockServiceAsync(request.ServiceId, cancellationToken))
         {
             throw new DomainRuleException("RF-REG-10", "El servicio está eliminado y no puede usarse para nuevas citas.");
         }
 
-        // Waits for any reschedule or cancel that holds this slot. Counts after the lock, so it sees their committed result.
+
         await TakeSlotsAsync([slot], cancellationToken);
 
         var relevant = await LoadRelevantAsync(request.Date, request.StartTime, request.ServiceId, request.PetId, cancellationToken);
@@ -87,7 +87,7 @@ public sealed class ScheduleRepository(
         BusinessRulesOptions options,
         CancellationToken cancellationToken)
     {
-        // Existence check (LINQ, no tracking). Returns null when the appointment does not exist, as before.
+
         var origin = await FindAppointmentSnapshotAsync(appointmentId, cancellationToken);
 
         if (origin is null)
@@ -95,14 +95,14 @@ public sealed class ScheduleRepository(
             return null;
         }
 
-        // An appointment already cancelled at the time of the operation is RF-PRO-07 (R13-13).
-        // A cancellation that happens after this snapshot is a version conflict (RF-PRO-11) via EnsureSameVersion.
+
+
         if (origin.Value.Status == AppointmentStatus.Cancelled)
         {
             throw new DomainRuleException(PersistenceErrors.AppointmentCancelledCode, PersistenceErrors.AppointmentCancelledMessage);
         }
 
-        // Only the resulting service is validated (D-B). Pet and owner may be deleted.
+
         var serviceDeleted = await ServiceDeletedFlagAsync(request.ServiceId, cancellationToken);
 
         if (serviceDeleted is null)
@@ -121,10 +121,10 @@ public sealed class ScheduleRepository(
 
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
-        // Origin and destination in fixed order to avoid deadlocks between crossed reschedules (plan step 6).
+
         await TakeSlotsAsync([origin.Value.Slot, destination], cancellationToken);
 
-        // Tracked load taken under the turn. Its version is the one checked on save (R13-7).
+
         var existing = await LoadFreshAsync(appointmentId, cancellationToken);
 
         if (existing is null)
@@ -139,7 +139,7 @@ public sealed class ScheduleRepository(
 
         var updated = new AppointmentRequest(existing.PetId, request.Date, request.StartTime, request.ServiceId);
 
-        // The appointment's own slot is excluded from the count inside AppointmentModificationRules.ValidateUpdate (plan step 8).
+
         existing.Update(actorRole, reason, nowUtc, updated, nowUtc, options, relevant);
 
         await PersistenceErrors.SaveChangesAsync(context, cancellationToken);
@@ -168,7 +168,7 @@ public sealed class ScheduleRepository(
 
         await TakeSlotsAsync([origin.Value.Slot], cancellationToken);
 
-        // Tracked load taken under the turn, so the checks use the confirmed state.
+
         var existing = await LoadFreshAsync(appointmentId, cancellationToken);
 
         if (existing is null)
@@ -187,8 +187,8 @@ public sealed class ScheduleRepository(
         return existing;
     }
 
-    // Cancels the confirmed future appointments of the service and deletes it in one transaction (R18-1, D3).
-    // Slot turns are taken first; appointments found under those turns are added to the set, at most MaxDiscoveryRetries times (D5).
+
+
     public async Task<bool> DeleteServiceAsync(
         Guid serviceId,
         UserRole actorRole,
@@ -205,7 +205,7 @@ public sealed class ScheduleRepository(
             return false;
         }
 
-        // Snapshot before the transaction. Slot rows are created here, outside the transaction, as in CancelAsync.
+
         var captured = await FindFutureConfirmedAsync(serviceId, options, nowUtc, cancellationToken);
 
         foreach (var slot in captured.Values.Select(snapshot => snapshot.Slot).Distinct())
@@ -215,8 +215,8 @@ public sealed class ScheduleRepository(
 
         await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted, cancellationToken);
 
-        // Service row first, same order as BookAsync. Blocks bookings on this service until commit (decision 1 A).
-        // If another deletion committed first, the service is gone and nothing else is done.
+
+
         if (!await LockServiceAsync(serviceId, cancellationToken))
         {
             return false;
@@ -226,7 +226,7 @@ public sealed class ScheduleRepository(
 
         while (true)
         {
-            // Waits for any reschedule, cancel or booking that holds these slots. Counts after the locks, so it sees their committed result.
+
             await TakeSlotsAsync(captured.Values.Select(snapshot => snapshot.Slot), cancellationToken);
 
             var current = await FindFutureConfirmedAsync(serviceId, options, nowUtc, cancellationToken);
@@ -249,7 +249,7 @@ public sealed class ScheduleRepository(
 
             foreach (var (appointmentId, snapshot) in discovered)
             {
-                // Rows are not created inside the transaction: a unique violation would abort it. The client retries and the row is created before the transaction.
+
                 if (!await SlotControlExistsAsync(snapshot.Slot, cancellationToken))
                 {
                     throw new DomainRuleException(PersistenceErrors.ConcurrencyCode, PersistenceErrors.AppointmentModifiedMessage);
@@ -266,7 +266,7 @@ public sealed class ScheduleRepository(
             return false;
         }
 
-        // Tracked load under the turns. Version, status and slot must match the snapshot (RF-PRO-11).
+
         var tracked = await context.Appointments
             .Where(candidate => captured.Keys.Contains(candidate.Id))
             .ToListAsync(cancellationToken);
@@ -293,7 +293,7 @@ public sealed class ScheduleRepository(
         return true;
     }
 
-    // Confirmed future appointments of the service, read without tracking and filtered by the domain selection rule (D2).
+
     private async Task<Dictionary<Guid, AppointmentSnapshot>> FindFutureConfirmedAsync(
         Guid serviceId,
         BusinessRulesOptions options,
@@ -315,7 +315,7 @@ public sealed class ScheduleRepository(
                     candidate.Status));
     }
 
-    // Every captured appointment must still be found with the same version, status and slot. Any change is a version conflict (RF-PRO-11).
+
     private static void EnsureUnchanged(
         Dictionary<Guid, AppointmentSnapshot> captured,
         Dictionary<Guid, AppointmentSnapshot> current)
@@ -329,12 +329,12 @@ public sealed class ScheduleRepository(
         }
     }
 
-    // Tracked load for the business checks. Status and Version are the concurrency tokens checked on save.
+
     private Task<Appointment?> LoadFreshAsync(Guid appointmentId, CancellationToken cancellationToken) =>
         context.Appointments.FirstOrDefaultAsync(appointment => appointment.Id == appointmentId, cancellationToken);
 
-    // Snapshot of the appointment as currently stored, read without tracking before the transaction.
-    // Slot creates the slot row; Version and Status are compared with the tracked load taken under the turn.
+
+
     private async Task<AppointmentSnapshot?> FindAppointmentSnapshotAsync(Guid appointmentId, CancellationToken cancellationToken)
     {
         var row = await context.Appointments
@@ -348,8 +348,8 @@ public sealed class ScheduleRepository(
             : new AppointmentSnapshot(new SlotKey(row.Date, row.StartTime, row.ServiceId), row.Version, row.Status);
     }
 
-    // The slot row is created in its own operation, before the transaction (R13-4, plan step 4).
-    // Appointments created before T-R13-05 have no row yet, so origin rows are created here as well.
+
+
     private async Task EnsureSlotControlAsync(SlotKey slot, CancellationToken cancellationToken)
     {
         if (await SlotControlExistsAsync(slot, cancellationToken))
@@ -366,7 +366,7 @@ public sealed class ScheduleRepository(
         }
         catch (DbUpdateException exception) when (exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
         {
-            // Another operation created the row first. Detach the failed insert and look the row up once.
+
             context.Entry(control).State = EntityState.Detached;
 
             if (!await SlotControlExistsAsync(slot, cancellationToken))
@@ -383,9 +383,9 @@ public sealed class ScheduleRepository(
                 && control.StartTime == slot.StartTime
                 && control.ServiceId == slot.ServiceId, cancellationToken);
 
-    // Takes the service row lock for the rest of the transaction (decision 1 A). Returns false when the service is missing or soft-deleted.
-    // Uses ExecuteUpdateAsync, the same mechanism as TakeSlotsAsync: the UPDATE holds the row lock until commit or rollback.
-    // The value written is the column's own value, so no data changes.
+
+
+
     private async Task<bool> LockServiceAsync(Guid serviceId, CancellationToken cancellationToken)
     {
         var locked = await context.Services
@@ -395,7 +395,7 @@ public sealed class ScheduleRepository(
         return locked == 1;
     }
 
-    // Takes the turn of each distinct slot in fixed order. The UPDATE holds the row lock until commit or rollback (R13-4).
+
     private async Task TakeSlotsAsync(IEnumerable<SlotKey> slots, CancellationToken cancellationToken)
     {
         foreach (var slot in slots.Distinct().OrderBy(key => key.Date).ThenBy(key => key.StartTime.StartTime).ThenBy(key => key.ServiceId))
@@ -413,7 +413,7 @@ public sealed class ScheduleRepository(
         }
     }
 
-    // The version and status read before the turn must match the tracked load taken under it. Any change in between is a version conflict (RF-PRO-11).
+
     private static void EnsureSameVersion(Appointment existing, AppointmentSnapshot captured)
     {
         if (existing.Version != captured.Version || existing.Status != captured.Status)
@@ -422,7 +422,7 @@ public sealed class ScheduleRepository(
         }
     }
 
-    // The slot must still be the stored slot once the turn is held. If another operation moved the appointment, report a version conflict (RF-PRO-11).
+
     private static void EnsureSameSlot(Appointment existing, SlotKey origin)
     {
         var current = new SlotKey(existing.Date, existing.StartTime, existing.ServiceId);
@@ -433,7 +433,7 @@ public sealed class ScheduleRepository(
         }
     }
 
-    // Existence and deletion checks (LINQ, AsNoTracking). Null when the row does not exist; otherwise true when soft-deleted.
+
     private Task<bool?> PetDeletedFlagAsync(Guid petId, CancellationToken cancellationToken) =>
         context.Pets
             .AsNoTracking()
@@ -455,8 +455,8 @@ public sealed class ScheduleRepository(
             .Select(user => (bool?)(user.DeletedAt != null))
             .FirstOrDefaultAsync(cancellationToken);
 
-    // Confirmed appointments of the target slot plus the pet's confirmed appointments, without duplicates.
-    // The appointment being rescheduled is excluded by SchedulingRules (excludeAppointmentId), so it is not counted against itself.
+
+
     private async Task<List<AppointmentSummary>> LoadRelevantAsync(
         DateOnly date,
         TimeSlot startTime,

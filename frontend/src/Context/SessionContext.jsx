@@ -4,7 +4,7 @@ import { registerUnauthorizedHandler } from '../Services/apiClient'
 
 const SessionContext = createContext(null)
 
-// Holds only shared session state. Storage and HTTP stay in Services/.
+
 export function SessionProvider({ children }) {
   const [user, setUser] = useState(null)
   const [isRestoring, setIsRestoring] = useState(true)
@@ -16,7 +16,7 @@ export function SessionProvider({ children }) {
     setUser(null)
   }, [])
 
-  // A 401 on a protected request ends the session and shows the expiry notice (plan 3.5).
+
   const expireSession = useCallback(() => {
     authService.clearStoredSession()
     setSessionExpired(true)

@@ -55,7 +55,7 @@ public class Service
         Type = candidate.Type;
     }
 
-    // Logical deletion (RF-REG-10). Services have no uniqueness constraint, so no value is transformed.
+
     public void Delete(DateTimeOffset deletedAt)
     {
         if (IsDeleted)

@@ -2,14 +2,14 @@ import { useState } from 'react'
 import Button from './Button'
 import FormErrorBanner from './FormErrorBanner'
 import FormField from './FormField'
-// Pure helpers only (no network): see the Components/ import rule in the frontend docs.
+
 import { splitFieldErrors } from '../Services/errorMessages'
 import { SERVICE_TYPE_OPTIONS } from '../Services/format'
 import { validateService } from '../Services/validation'
 
 const FORM_FIELDS = ['name', 'type']
 
-// Service create/edit form. The type is chosen only from the three closed options.
+
 function ServiceForm({ initialValues = {}, onSubmit, onCancel }) {
   const [name, setName] = useState(initialValues.name ?? '')
   const [type, setType] = useState(initialValues.type ?? '')

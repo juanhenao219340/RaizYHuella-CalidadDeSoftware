@@ -9,8 +9,8 @@ import Table from '../Components/Table'
 import { getPet, listPets } from '../Services/petsService'
 import { formatDate } from '../Services/format'
 
-// Read-only pet list for the administrator (D3-A). No create, edit or delete actions (CA-REG-08).
-// The owner name comes from the backend (ownerName / ownerDeleted, null for owners).
+
+
 function OwnerCell({ pet }) {
   if (pet.ownerName == null) return '—'
   return (

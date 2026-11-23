@@ -10,7 +10,7 @@ public class SchedulingRulesCapacityTests
     [Fact]
     public void Validate_ThreeConfirmedOfFour_IsAccepted()
     {
-        // Four capacity minus three confirmed leaves one slot.
+
         var result = Validate(ConfirmedInSlot(3));
 
         Assert.True(result.IsSuccess);
@@ -55,7 +55,7 @@ public class SchedulingRulesCapacityTests
     [Fact]
     public void Validate_RescheduleExcludesOwnAppointmentFromCount()
     {
-        // Four confirmed in the slot, but one of them is the appointment being rescheduled.
+
         var appointments = ConfirmedInSlot(4);
         var ownId = appointments[0].Id;
 

@@ -2,7 +2,7 @@ import Button from './Button'
 import FormErrorBanner from './FormErrorBanner'
 import Modal from './Modal'
 
-// Confirmation before a destructive action. The parent performs the request and passes errors back.
+
 function ConfirmDialog({
   title,
   message,

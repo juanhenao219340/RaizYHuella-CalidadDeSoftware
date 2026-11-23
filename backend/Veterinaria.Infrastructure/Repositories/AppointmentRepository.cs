@@ -10,7 +10,7 @@ namespace Veterinaria.Infrastructure.Repositories;
 
 public sealed class AppointmentRepository(VeterinaryDbContext context) : IAppointmentRepository
 {
-    // Tracked, so that the Status concurrency token captured at load time is used on update.
+
     public Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         context.Appointments.FirstOrDefaultAsync(appointment => appointment.Id == id, cancellationToken);
 
@@ -47,7 +47,7 @@ public sealed class AppointmentRepository(VeterinaryDbContext context) : IAppoin
                 appointment.Status))
             .ToListAsync(cancellationToken);
 
-    // Counts confirmed appointments only. Deleted pets and services are not filtered: their future appointments keep the capacity (D-H).
+
     public async Task<IReadOnlyDictionary<TimeSlot, int>> CountConfirmedByDayAndServiceAsync(
         DateOnly date,
         Guid serviceId,

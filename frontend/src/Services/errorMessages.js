@@ -13,18 +13,18 @@ const FALLBACK_MESSAGES = {
   422: 'Regla de negocio incumplida.',
 }
 
-// Chooses the text shown to the user from a ProblemDetails body.
-// The API is the source of truth for messages; they are already in Spanish.
+
+
 export function getProblemMessage(status, problem) {
-  // 404 uses title only: the API never reveals whether a resource exists (plan P8-4).
+
   if (status === 404 && problem?.title) {
     return problem.title
   }
   return problem?.detail || problem?.title || FALLBACK_MESSAGES[status] || GENERIC_ERROR_MESSAGE
 }
 
-// Converts an API error key to the camelCase field name used by the forms.
-// Examples: "Name" -> "name", "$.type" -> "type", "$.items[0].price" -> "price".
+
+
 export function toFieldName(key) {
   let name = String(key).replace(/^\$\./, '')
   if (/[.[\]]/.test(name)) {
@@ -34,8 +34,8 @@ export function toFieldName(key) {
   return name.charAt(0).toLowerCase() + name.slice(1)
 }
 
-// Maps ValidationProblemDetails.errors to one message per camelCase field (first message wins).
-// Keys that are not form fields (such as "request") are kept; splitFieldErrors routes them to the banner.
+
+
 export function getFieldErrors(problem) {
   const errors = problem?.errors
   if (!errors || typeof errors !== 'object') {
@@ -52,8 +52,8 @@ export function getFieldErrors(problem) {
   }, {})
 }
 
-// Separates server field errors into the ones that match a visible form field and the rest.
-// Unmatched messages are joined into one text, to be shown in the form banner instead of being dropped.
+
+
 export function splitFieldErrors(fieldErrors, knownFields) {
   const matched = {}
   const unmatched = []
@@ -67,7 +67,7 @@ export function splitFieldErrors(fieldErrors, knownFields) {
   return { fieldErrors: matched, unmatchedMessage: unmatched.join(' ') }
 }
 
-// Identifies which form field a 409 conflict (RF-REG-06) refers to, from its Spanish message.
+
 export function getConflictField(error) {
   if (error?.status !== 409) {
     return null

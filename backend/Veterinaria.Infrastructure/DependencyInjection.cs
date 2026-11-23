@@ -37,8 +37,8 @@ public static class DependencyInjection
             .Validate(options => options.LockoutMinutes > 0, "Lockout:LockoutMinutes must be greater than zero.")
             .ValidateOnStart();
 
-        // SeedOptions is not an IOptions<T> (its SEED_ADMIN_* keys are flat variables). It is loaded and validated
-        // eagerly here, so an invalid value stops composition (and therefore start-up) before anything is served.
+
+
         var seedOptions = SeedOptions.Load(configuration);
         SeedOptions.Validate(seedOptions);
         services.AddSingleton(seedOptions);

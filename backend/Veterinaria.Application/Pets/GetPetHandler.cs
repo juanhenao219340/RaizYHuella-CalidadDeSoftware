@@ -7,8 +7,8 @@ public sealed record GetPetQuery(Guid PetId, Guid CallerId, UserRole CallerRole)
 
 public sealed class GetPetHandler(IPetRepository petRepository)
 {
-    // Owners see only their own pets; administrators see every non-deleted pet (read-only, OD-4).
-    // Administrators also get the owner name and deletion state (R14-1); owners get no owner data (null).
+
+
     public async Task<PetWithOwner?> HandleAsync(GetPetQuery query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);

@@ -4,10 +4,10 @@
 
 namespace Veterinaria.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class RemovePetIdentifier : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
@@ -19,7 +19,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                 table: "Pets");
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import NavMenu from './NavMenu'
-// Pure helper import from Services/ (format.js): no network calls in this component.
+
 import { formatRole } from '../Services/format'
 
-// Top bar and page container. Receives session data and logout through props.
+
 function AppLayout({ user = null, role = null, onLogout }) {
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

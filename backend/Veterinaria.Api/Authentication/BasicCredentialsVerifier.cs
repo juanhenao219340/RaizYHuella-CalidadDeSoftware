@@ -10,8 +10,8 @@ public sealed class BasicCredentialsVerifier(IOptions<BasicAuthOptions> options)
 {
     private const string Scheme = "Basic ";
 
-    // Only used by /api/auth/login (RNF-SEG-04 and Q-1 accepted risk). Never answers with WWW-Authenticate,
-    // so the browser does not show its credentials dialog. Failures are not logged (OD-8).
+
+
     public bool IsValid(HttpRequest request)
     {
         var header = request.Headers.Authorization.ToString();
@@ -40,7 +40,7 @@ public sealed class BasicCredentialsVerifier(IOptions<BasicAuthOptions> options)
         var username = Encoding.UTF8.GetBytes(decoded[..separator]);
         var password = Encoding.UTF8.GetBytes(decoded[(separator + 1)..]);
 
-        // Non-short-circuit AND keeps the comparison time independent of which part is wrong.
+
         var expected = options.Value;
         var usernameMatches = CryptographicOperations.FixedTimeEquals(username, Encoding.UTF8.GetBytes(expected.Username));
         var passwordMatches = CryptographicOperations.FixedTimeEquals(password, Encoding.UTF8.GetBytes(expected.Password));

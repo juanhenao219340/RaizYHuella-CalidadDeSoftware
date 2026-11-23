@@ -1,4 +1,4 @@
-// Labels and date helpers for display. Pure functions (no IO, no React). Spanish output.
+
 
 export const ROLE_LABELS = {
   Administrator: 'Administrador',
@@ -40,13 +40,13 @@ export function formatAppointmentStatus(status) {
   return APPOINTMENT_STATUS_LABELS[status] ?? status ?? ''
 }
 
-// Converts an API date (yyyy-MM-dd) to dd/mm/aaaa. UTC avoids a one-day shift.
+
 export function formatDate(isoDate) {
   if (!isoDate) return ''
   return dateFormatter.format(new Date(`${isoDate}T00:00:00Z`))
 }
 
-// Appointment date and start time: "25/11/2026 08:00".
+
 export function formatDateTime(isoDate, startTime) {
   return [formatDate(isoDate), startTime].filter(Boolean).join(' ')
 }
@@ -55,7 +55,7 @@ export function formatSlotCount(count) {
   return count === 1 ? '1 cupo' : `${count} cupos`
 }
 
-// Today in the browser's local calendar, as yyyy-MM-dd (used for the date min; the API decides).
+
 export function todayIsoDate() {
   const now = new Date()
   const month = String(now.getMonth() + 1).padStart(2, '0')

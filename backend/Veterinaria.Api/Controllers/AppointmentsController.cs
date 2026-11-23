@@ -20,7 +20,7 @@ public sealed class AppointmentsController(
     RescheduleAppointmentHandler rescheduleAppointmentHandler,
     CancelAppointmentHandler cancelAppointmentHandler) : ControllerBase
 {
-    // Same body as the JWT OnChallenge gate in Program.cs. A new instance per response: ProblemDetails is mutable.
+
     private static ProblemDetails SessionProblem() => new()
     {
         Status = StatusCodes.Status401Unauthorized,
@@ -39,8 +39,8 @@ public sealed class AppointmentsController(
 
     private static readonly Regex ReferenceNumberPattern = new(AppointmentSearchLimits.ReferenceNumberPattern, RegexOptions.CultureInvariant);
 
-    // All roles with a valid token can read: administrators see everything, owners only their own (RF-CON-05).
-    // Filters are optional and combined with AND. ownerId and unknown parameters are ignored (RF-PRO-09, RF-CON-06).
+
+
     [HttpGet]
     [Authorize]
     [ProducesResponseType<IReadOnlyList<AppointmentListItemResponse>>(StatusCodes.Status200OK)]
@@ -72,7 +72,7 @@ public sealed class AppointmentsController(
         return Ok(appointments.Select(item => ToListItemResponse(item, callerRole)).ToList());
     }
 
-    // Read-only for administrators and owners (D-A). Routed before any {id:guid} route.
+
     [HttpGet("availability")]
     [Authorize]
     [ProducesResponseType<IReadOnlyList<SlotAvailabilityResponse>>(StatusCodes.Status200OK)]
@@ -116,7 +116,7 @@ public sealed class AppointmentsController(
         return Ok(slots.Select(slot => new SlotAvailabilityResponse(slot.StartTime.ToString(), slot.RemainingSlots, slot.Available)).ToList());
     }
 
-    // Owner only. OwnerId is the JWT subject, never the body (RF-PRO-09).
+
     [HttpPost]
     [Authorize(Policy = "Owner")]
     [ProducesResponseType<AppointmentResponse>(StatusCodes.Status201Created)]
@@ -151,7 +151,7 @@ public sealed class AppointmentsController(
             : StatusCode(StatusCodes.Status201Created, ToResponse(appointment));
     }
 
-    // Administrator only. The caller's role is passed so the domain re-asserts it (RF-PRO-06).
+
     [HttpPut("{id:guid}")]
     [Authorize(Policy = "Administrator")]
     [ProducesResponseType<AppointmentResponse>(StatusCodes.Status200OK)]
@@ -181,7 +181,7 @@ public sealed class AppointmentsController(
         return appointment is null ? NotFoundAppointment() : Ok(ToResponse(appointment));
     }
 
-    // Administrator only. The reason is mandatory and is stored as the last change reason (RN-04, RF-PRO-08).
+
     [HttpPost("{id:guid}/cancel")]
     [Authorize(Policy = "Administrator")]
     [ProducesResponseType<AppointmentResponse>(StatusCodes.Status200OK)]
@@ -205,7 +205,7 @@ public sealed class AppointmentsController(
         return appointment is null ? NotFoundAppointment() : Ok(ToResponse(appointment));
     }
 
-    // Validation order: repeated parameter, trimming, length and characters, serviceType. The first error is returned (T-07 section 6).
+
     private bool TryReadListFilters(out ListFilters filters, out ValidationProblemDetails? problem)
     {
         var query = Request.Query;
@@ -256,7 +256,7 @@ public sealed class AppointmentsController(
         return true;
     }
 
-    // Trims the value; blank means absent (D-7). A repeated key is rejected instead of choosing one value.
+
     private bool TryReadSingle(IQueryCollection query, string key, out string? value, out ValidationProblemDetails? problem)
     {
         var values = query[key];
@@ -284,7 +284,7 @@ public sealed class AppointmentsController(
             Extensions = { ["traceId"] = HttpContext.TraceIdentifier }
         };
 
-    // OwnerName is exposed to administrators only (R19-1). Owners never receive it.
+
     private static AppointmentListItemResponse ToListItemResponse(AppointmentListItem item, UserRole callerRole) =>
         new(
             item.Id,
@@ -310,7 +310,7 @@ public sealed class AppointmentsController(
         return userId is not null && role is not null;
     }
 
-    // Same response for "missing" and "not visible" (no data leak).
+
     private ObjectResult NotFoundAppointment() =>
         NotFound(new ProblemDetails
         {

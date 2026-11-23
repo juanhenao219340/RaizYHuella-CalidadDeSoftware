@@ -10,6 +10,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>
 
     public string? Phone { get; set; }
 
-    // Logical deletion marker (RF-REG-10). Null while the account is active.
+
     public DateTimeOffset? DeletedAt { get; set; }
 }

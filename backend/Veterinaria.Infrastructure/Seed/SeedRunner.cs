@@ -14,7 +14,7 @@ public sealed class SeedRunner(
     SeedOptions seedOptions,
     ILogger<SeedRunner> logger)
 {
-    // Called by the host on every start-up: migrates the schema, then seeds idempotently.
+
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Applying database migrations.");

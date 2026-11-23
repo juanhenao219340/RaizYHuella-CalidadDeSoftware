@@ -24,7 +24,7 @@ public class User
 
     public bool IsDeleted => DeletedAt is not null;
 
-    // Parameterless constructor reserved for EF Core (materialization); does not validate and is not for application use.
+
     private User()
     {
     }
@@ -51,7 +51,7 @@ public class User
         Role = candidate.Role;
     }
 
-    // Materialization from Identity (UserMapper). Assigns stored data without validation: it is not used to create users.
+
     public static User Reconstitute(
         Guid id,
         string identification,
@@ -96,7 +96,7 @@ public class User
         Role = candidate.Role;
     }
 
-    // Logical deletion (RF-REG-10). The row is kept; identification and e-mail are replaced by non-reusable values.
+
     public void Delete(Guid releaseToken, DateTimeOffset deletedAt)
     {
         if (IsDeleted)

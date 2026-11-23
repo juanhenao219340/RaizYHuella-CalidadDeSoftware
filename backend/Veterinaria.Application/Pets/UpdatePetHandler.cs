@@ -3,7 +3,7 @@ using Veterinaria.Domain.Entities;
 
 namespace Veterinaria.Application.Pets;
 
-// The owner is not editable (D-6). Only the owner of the pet can update it; anything else is not visible (404).
+
 public sealed record UpdatePetCommand(
     Guid PetId,
     Guid CallerId,

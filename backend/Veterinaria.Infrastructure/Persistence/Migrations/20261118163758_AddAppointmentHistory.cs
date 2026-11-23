@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Veterinaria.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddAppointmentHistory : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -82,7 +82,7 @@ namespace Veterinaria.Infrastructure.Persistence.Migrations
                 column: "PreviousServiceId");
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

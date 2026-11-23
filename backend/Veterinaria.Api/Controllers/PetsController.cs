@@ -17,7 +17,7 @@ public sealed class PetsController(
     ListPetsHandler listPetsHandler,
     DeletePetHandler deletePetHandler) : ControllerBase
 {
-    // Same body as the JWT OnChallenge gate in Program.cs. A new instance per response: ProblemDetails is mutable.
+
     private static ProblemDetails SessionProblem() => new()
     {
         Status = StatusCodes.Status401Unauthorized,
@@ -25,7 +25,7 @@ public sealed class PetsController(
         Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2"
     };
 
-    // Owners see their own pets; administrators see every non-deleted pet (read-only, OD-4).
+
     [HttpGet]
     [Authorize]
     [ProducesResponseType<IReadOnlyList<PetResponse>>(StatusCodes.Status200OK)]
@@ -60,8 +60,8 @@ public sealed class PetsController(
         return pet is null ? NotFoundPet() : Ok(ToResponse(pet));
     }
 
-    // Write operations are owner-only (policy). Administrators receive 403 here (D-3).
-    // OwnerId is always the JWT subject; the body cannot provide it (D-1, RF-PRO-09).
+
+
     [HttpPost]
     [Authorize(Policy = "Owner")]
     [ProducesResponseType<PetResponse>(StatusCodes.Status201Created)]
@@ -85,7 +85,7 @@ public sealed class PetsController(
                 callerId),
             cancellationToken);
 
-        // Owners never receive owner data: ownerName and ownerDeleted are null (R14-1, CA-REG-08 ii).
+
         return StatusCode(StatusCodes.Status201Created, ToResponse(new PetWithOwner(pet, OwnerName: null, OwnerDeleted: null)));
     }
 
@@ -139,7 +139,7 @@ public sealed class PetsController(
         return userId is not null && role is not null;
     }
 
-    // Same response for "missing", "deleted" and "belongs to another owner" (no data leak).
+
     private ObjectResult NotFoundPet() =>
         NotFound(new ProblemDetails
         {
@@ -147,7 +147,7 @@ public sealed class PetsController(
             Title = "La mascota no existe o no está disponible."
         });
 
-    // Single response shape for every role: owner fields are null for owners (R14-1, RF-REG-07 a).
+
     private static PetResponse ToResponse(PetWithOwner petWithOwner)
     {
         var pet = petWithOwner.Pet;

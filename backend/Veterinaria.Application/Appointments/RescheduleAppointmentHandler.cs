@@ -14,7 +14,7 @@ public sealed record RescheduleAppointmentCommand(
     string StartTime,
     string? Reason);
 
-// Administrator only (policy). One instant is read per operation and used for validation.
+
 public sealed class RescheduleAppointmentHandler(
     IScheduleRepository scheduleRepository,
     BusinessRulesOptions options,

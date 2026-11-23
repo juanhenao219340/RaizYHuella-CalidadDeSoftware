@@ -28,7 +28,7 @@ public sealed class PetRepository(VeterinaryDbContext context) : IPetRepository
             .OrderBy(pet => pet.Name)
             .ToListAsync(cancellationToken);
 
-    // One query per call, no per-row lookups (RNF-ARQ-07: LINQ only, no hand-written SQL).
+
     public async Task<IReadOnlyList<PetWithOwner>> ListAllWithOwnerAsync(CancellationToken cancellationToken) =>
         await WithOwner(context.Pets
                 .AsNoTracking()
@@ -42,8 +42,8 @@ public sealed class PetRepository(VeterinaryDbContext context) : IPetRepository
                 .Where(pet => pet.Id == id && pet.DeletedAt == null))
             .FirstOrDefaultAsync(cancellationToken);
 
-    // LEFT JOIN to the users table. Deleted owners are NOT filtered out (FB-2, RF-REG-10 f).
-    // A pet whose owner row is missing is kept, with null owner data (D-3).
+
+
     private IQueryable<PetWithOwner> WithOwner(IQueryable<Pet> pets) =>
         pets
             .GroupJoin(context.Users, pet => pet.OwnerId, user => user.Id, (pet, owners) => new { pet, owners })

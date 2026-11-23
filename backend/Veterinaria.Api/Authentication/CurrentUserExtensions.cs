@@ -6,7 +6,7 @@ namespace Veterinaria.Api.Authentication;
 
 public static class CurrentUserExtensions
 {
-    // Identity always comes from the JWT subject, never from the request body (RF-PRO-09).
+
     public static Guid? FindUserId(this ClaimsPrincipal principal)
     {
         var subject = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;

@@ -7,13 +7,13 @@ namespace Veterinaria.Api.Middleware;
 
 public sealed class DomainExceptionHandler(ILogger<DomainExceptionHandler> logger) : IExceptionHandler
 {
-    // Conflicts with existing data (OD-6, RF-PRO-07 enmienda r9). RF-REG-06 covers duplicated e-mail/identification.
+
     private static readonly HashSet<string> ConflictCodes =
     [
         "RN-03", "P-02", "RF-PRO-07", "RF-PRO-11", "RF-REG-06"
     ];
 
-    // Permission rules (RF-PRO-09): administrator over administrator, owner over own account, owner deleting own account.
+
     private static readonly HashSet<string> ForbiddenCodes =
     [
         "RF-PRO-09"
@@ -27,7 +27,7 @@ public sealed class DomainExceptionHandler(ILogger<DomainExceptionHandler> logge
             return true;
         }
 
-        // Deleted owner during an appointment operation (RF-AUT-07): same 401 text as the JWT gate (T-05).
+
         if (exception is InactiveAccountException)
         {
             httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -55,7 +55,7 @@ public sealed class DomainExceptionHandler(ILogger<DomainExceptionHandler> logge
 
     private static async Task WriteDomainErrorAsync(HttpContext httpContext, DomainRuleException exception, CancellationToken cancellationToken)
     {
-        // Password policy failures are reported as validation errors so the client can show them next to the field (M-10).
+
         if (exception.Code == "RF-AUT-06")
         {
             httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;

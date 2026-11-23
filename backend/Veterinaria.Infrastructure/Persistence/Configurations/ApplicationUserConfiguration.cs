@@ -18,7 +18,7 @@ public sealed class ApplicationUserConfiguration : IEntityTypeConfiguration<Appl
             .IsUnique()
             .HasDatabaseName("IX_AspNetUsers_Identification");
 
-        // Replaces the non-unique "EmailIndex" created by IdentityDbContext on the same column.
+
         builder.HasIndex(user => user.NormalizedEmail)
             .IsUnique()
             .HasDatabaseName("IX_AspNetUsers_NormalizedEmail");

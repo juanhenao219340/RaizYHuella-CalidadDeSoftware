@@ -6,7 +6,7 @@ public sealed record DeletePetCommand(Guid PetId, Guid CallerId);
 
 public sealed class DeletePetHandler(IPetRepository petRepository, TimeProvider timeProvider)
 {
-    // Returns false when the pet is missing, deleted, or not owned by the caller (the API answers 404).
+
     public async Task<bool> HandleAsync(DeletePetCommand command, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command);
@@ -18,7 +18,7 @@ public sealed class DeletePetHandler(IPetRepository petRepository, TimeProvider 
             return false;
         }
 
-        // Pets have no identifier to replace on deletion (RF-REG-10(e)).
+
         pet.Delete(timeProvider.GetUtcNow());
         await petRepository.UpdateAsync(pet, cancellationToken);
 
